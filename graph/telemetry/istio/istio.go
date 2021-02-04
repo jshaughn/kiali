@@ -70,9 +70,52 @@ func BuildNamespacesTrafficMap(o graph.TelemetryOptions, client *prometheus.Clie
 func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client *prometheus.Client) graph.TrafficMap {
 	// create map to aggregate traffic by protocol and response code
 	trafficMap := graph.NewTrafficMap()
-
-	requestsMetric := "istio_requests_total"
 	duration := o.Namespaces[namespace].Duration
+
+	// HTTP/GRPC traffic
+	metric := "istio_requests_total"
+	groupBy := "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags"
+
+	// Source telemetry is used only to capture [failed] requests that did not reach a destination workload
+	// 1) query source telemetry for requests to namespace services that could not be serviced
+	query := fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace!="%s",destination_service=~"\\.%s\\."} [%vs])) by (%s)`,
+		metric,
+		namespace,
+		namespace,
+		int(duration.Seconds()), // range duration for the query
+		groupBy)
+	sourceToVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMap(trafficMap, &sourceToVector, o)
+
+	// 2) query source telemetry for requests from namespace workloads that could not be serviced
+	query = fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace="%s"} [%vs])) by (%s)`,
+		metric,
+		namespace,
+		int(duration.Seconds()), // range duration for the query
+		groupBy)
+	sourceFromVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMap(trafficMap, &sourceFromVector, o)
+
+	// Destination telemetry is used to capture all other relevant requests. It is noteworthy to realize that a single request from
+	// a source workload can result in multiple requests to an upstream (destination) workload (e.g retry).
+	// 3) query dest telemetry for requests serviced by namespace workloads
+	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload_namespace!="%s",destination_workload_namespace="%s"} [%vs])) by (%s)`,
+		metric,
+		namespace,
+		namespace,
+		int(duration.Seconds()), // range duration for the query
+		groupBy)
+	destToVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMap(trafficMap, &destToVector, o)
+
+	// 4) query dest telemetry for requests made by namespace workloads and serviced by a destination workload
+	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload_namespace="%s",destination_workload!="unknown"} [%vs])) by (%s)`,
+		metric,
+		namespace,
+		int(duration.Seconds()), // range duration for the query
+		groupBy)
+	destFromVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMap(trafficMap, &destFromVector, o)
 
 	// query prometheus for request traffic in three queries:
 	// 1) query for traffic originating from "unknown" (i.e. the internet). Unknown sources have no istio sidecar so
@@ -80,69 +123,111 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 	//    always provides the workload namespace, and because destination_service_namespace is provided from the source,
 	//    and for a request originating on a different cluster, will be set to the namespace where the service-entry is
 	//    defined, on the other cluster.
-	groupBy := "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags"
-	query := fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload="unknown",destination_workload_namespace="%s"} [%vs])) by (%s)`,
-		requestsMetric,
+	/*
+		groupBy := "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags"
+		query := fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload="unknown",destination_workload_namespace="%s"} [%vs])) by (%s)`,
+			requestsMetric,
+			namespace,
+			int(duration.Seconds()), // range duration for the query
+			groupBy)
+		unkVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+		populateTrafficMap(trafficMap, &unkVector, o)
+
+		// 2) query for external traffic, originating from a workload outside of the namespace.  Exclude any "unknown" source telemetry (an unusual corner
+		//	  case resulting from pod lifecycle changes).  Here use destination_service_namespace to capture failed requests never reaching a dest workload.
+		reporter := "source"
+		sourceWorkloadNamespaceQuery := fmt.Sprintf(`source_workload_namespace!="%s"`, namespace)
+		query = fmt.Sprintf(`sum(rate(%s{reporter="%s",%s,source_workload!="unknown",destination_service_namespace="%s"} [%vs])) by (%s)`,
+			requestsMetric,
+			reporter,
+			sourceWorkloadNamespaceQuery,
+			namespace,
+			int(duration.Seconds()), // range duration for the query
+			groupBy)
+		extVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+		populateTrafficMap(trafficMap, &extVector, o)
+
+		// 3) query for internal traffic, originating from a workload inside of the namespace
+		query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s)`,
+			requestsMetric,
+			namespace,
+			int(duration.Seconds()), // range duration for the query
+			groupBy)
+		intVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+		populateTrafficMap(trafficMap, &intVector, o)
+	*/
+
+	// Section for TCP traffic
+	metric = "istio_tcp_sent_bytes_total"
+	groupBy = "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags"
+
+	// 1) query source telemetry for requests to namespace services that could not be serviced
+	query = fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace!="%s",destination_service=~"\\.%s\\."} [%vs])) by (%s)`,
+		metric,
+		namespace,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy)
-	unkVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMap(trafficMap, &unkVector, o)
+	sourceToVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMapTCP(trafficMap, &sourceToVector, o)
 
-	// 2) query for external traffic, originating from a workload outside of the namespace.  Exclude any "unknown" source telemetry (an unusual corner
-	//	  case resulting from pod lifecycle changes).  Here use destination_service_workload to capture failed requests never reaching a dest workload.
-	reporter := "source"
-	sourceWorkloadNamespaceQuery := fmt.Sprintf(`source_workload_namespace!="%s"`, namespace)
-	query = fmt.Sprintf(`sum(rate(%s{reporter="%s",%s,source_workload!="unknown",destination_service_namespace="%s"} [%vs])) by (%s)`,
-		requestsMetric,
-		reporter,
-		sourceWorkloadNamespaceQuery,
+	// 2) query source telemetry for requests from namespace workloads that could not be serviced
+	query = fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace="%s"} [%vs])) by (%s)`,
+		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy)
-	extVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMap(trafficMap, &extVector, o)
+	sourceFromVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMapTCP(trafficMap, &sourceFromVector, o)
 
-	// 3) query for internal traffic, originating from a workload inside of the namespace
-	query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s)`,
-		requestsMetric,
+	// 3) query dest telemetry for requests serviced by namespace workloads
+	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload_namespace!="%s",destination_workload_namespace="%s"} [%vs])) by (%s)`,
+		metric,
+		namespace,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy)
-	intVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMap(trafficMap, &intVector, o)
+	destToVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMapTCP(trafficMap, &destToVector, o)
 
-	// Section for TCP services (note, there is no TCP Istio traffic)
-	tcpMetric := "istio_tcp_sent_bytes_total"
-
-	// 1) query for traffic originating from "unknown" (i.e. the internet)
-	tcpGroupBy := "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags"
-	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload="unknown",destination_workload_namespace="%s"} [%vs])) by (%s)`,
-		tcpMetric,
+	// 4) query dest telemetry for requests made by namespace workloads and serviced by a destination workload
+	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload_namespace="%s",destination_workload!="unknown"} [%vs])) by (%s)`,
+		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
-		tcpGroupBy)
-	tcpUnkVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMapTCP(trafficMap, &tcpUnkVector, o)
+		groupBy)
+	destFromVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMapTCP(trafficMap, &destFromVector, o)
 
-	// 2) query for traffic originating from a workload outside of the namespace. Exclude any "unknown" source telemetry (an unusual corner case)
-	query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace!="%s",source_workload!="unknown",destination_service_namespace="%s"} [%vs])) by (%s)`,
-		tcpMetric,
-		namespace,
-		namespace,
-		int(duration.Seconds()), // range duration for the query
-		tcpGroupBy)
-	tcpExtVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMapTCP(trafficMap, &tcpExtVector, o)
+	/*
+		// 1) query for traffic originating from "unknown" (i.e. the internet)
+		query = fmt.Sprintf(`sum(rate(%s{reporter="destination",source_workload="unknown",destination_workload_namespace="%s"} [%vs])) by (%s)`,
+			metric,
+			namespace,
+			int(duration.Seconds()), // range duration for the query
+			tcpGroupBy)
+		tcpUnkVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+		populateTrafficMapTCP(trafficMap, &tcpUnkVector, o)
 
-	// 3) query for traffic originating from a workload inside of the namespace
-	query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s)`,
-		tcpMetric,
-		namespace,
-		int(duration.Seconds()), // range duration for the query
-		tcpGroupBy)
-	tcpInVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMapTCP(trafficMap, &tcpInVector, o)
+		// 2) query for traffic originating from a workload outside of the namespace. Exclude any "unknown" source telemetry (an unusual corner case)
+		query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace!="%s",source_workload!="unknown",destination_service_namespace="%s"} [%vs])) by (%s)`,
+			metric,
+			namespace,
+			namespace,
+			int(duration.Seconds()), // range duration for the query
+			tcpGroupBy)
+		tcpExtVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+		populateTrafficMapTCP(trafficMap, &tcpExtVector, o)
+
+		// 3) query for traffic originating from a workload inside of the namespace
+		query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s)`,
+			metric,
+			namespace,
+			int(duration.Seconds()), // range duration for the query
+			tcpGroupBy)
+		tcpInVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+		populateTrafficMapTCP(trafficMap, &tcpInVector, o)
+	*/
 
 	return trafficMap
 }
