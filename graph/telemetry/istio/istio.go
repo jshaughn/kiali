@@ -77,7 +77,7 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 	groupBy := "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags"
 
 	// Source telemetry is used only to capture [failed] requests that did not reach a destination workload
-	// 1) query source telemetry for requests to namespace services that could not be serviced
+	// 1) query source telemetry for requests from outside the namespace that could not be serviced
 	query := fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace!="%s",destination_service=~"^.*\\.%s\\..*$"} [%vs])) by (%s)`,
 		metric,
 		namespace,
@@ -98,7 +98,7 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 
 	// Destination telemetry is used to capture all other relevant requests. It is noteworthy to realize that a single request from
 	// a source workload can result in multiple requests to an upstream (destination) workload (e.g retry).
-	// 3) query dest telemetry for requests serviced by namespace workloads
+	// 3) query dest telemetry for requests from outside the namespace and serviced by namespace workloads
 	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_workload_namespace="%s",source_workload_namespace!="%s"} [%vs])) by (%s)`,
 		metric,
 		namespace,
@@ -580,7 +580,7 @@ func buildNodeTrafficMap(cluster, namespace string, n graph.Node, o graph.Teleme
 	case graph.NodeTypeService:
 		// Service nodes require two queries for incoming
 		// 1.a) query source telemetry for requests to the service that could not be serviced
-		query := fmt.Sprintf(`sum(rate(%s{reporter="source"%s,destination_workload="unknown",destination_service=~"^%s\\.%s\\..*$"} [%vs])) by (%s)`,
+		query = fmt.Sprintf(`sum(rate(%s{reporter="source"%s,destination_workload="unknown",destination_service=~"^%s\\.%s\\..*$"} [%vs])) by (%s)`,
 			metric,
 			destCluster,
 			n.Service,
