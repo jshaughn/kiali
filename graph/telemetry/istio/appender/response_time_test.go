@@ -13,11 +13,14 @@ import (
 func TestResponseTime(t *testing.T) {
 	assert := assert.New(t)
 
-	q0 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="destination",source_workload="unknown",destination_workload_namespace="bookinfo"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
+	q0 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="source",destination_workload="unknown",source_workload_namespace!="bookinfo",destination_service=~"^.*\\.bookinfo\\..*$"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
 	v0 := model.Vector{}
 
-	q1 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="source",source_workload_namespace!="bookinfo",source_workload!="unknown",destination_service_namespace="bookinfo"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
-	q1m0 := model.Metric{
+	q1 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="source",destination_workload="unknown",source_workload_namespace="bookinfo"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
+	v1 := model.Vector{}
+
+	q2 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="destination",destination_workload_namespace="bookinfo",source_workload_namespace!="bookinfo"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
+	q2m0 := model.Metric{
 		"source_workload_namespace":      "istio-system",
 		"source_workload":                "ingressgateway-unknown",
 		"source_canonical_service":       "ingressgateway",
@@ -30,13 +33,13 @@ func TestResponseTime(t *testing.T) {
 		"destination_canonical_service":  "productpage",
 		"destination_canonical_revision": "v1",
 		"response_code":                  "200"}
-	v1 := model.Vector{
+	v2 := model.Vector{
 		&model.Sample{
-			Metric: q1m0,
+			Metric: q2m0,
 			Value:  0.010}}
 
-	q2 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="source",source_workload_namespace="bookinfo"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
-	q2m0 := model.Metric{
+	q3 := `round(histogram_quantile(0.95, sum(rate(istio_request_duration_milliseconds_bucket{reporter="destination",source_workload_namespace="bookinfo"}[60s])) by (le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status)) > 0,0.001)`
+	q3m0 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "productpage-v1",
 		"source_canonical_service":       "productpage",
@@ -49,7 +52,7 @@ func TestResponseTime(t *testing.T) {
 		"destination_canonical_service":  "reviews",
 		"destination_canonical_revision": "v1",
 		"response_code":                  "200"}
-	q2m1 := model.Metric{
+	q3m1 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "productpage-v1",
 		"source_canonical_service":       "productpage",
@@ -62,7 +65,7 @@ func TestResponseTime(t *testing.T) {
 		"destination_canonical_service":  "reviews",
 		"destination_canonical_revision": "v2",
 		"response_code":                  "200"}
-	q2m2 := model.Metric{
+	q3m2 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v1",
 		"source_canonical_service":       "reviews",
@@ -75,7 +78,7 @@ func TestResponseTime(t *testing.T) {
 		"destination_canonical_service":  "ratings",
 		"destination_canonical_revision": "v1",
 		"response_code":                  "200"}
-	q2m3 := model.Metric{
+	q3m3 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v2",
 		"source_canonical_service":       "reviews",
@@ -88,7 +91,7 @@ func TestResponseTime(t *testing.T) {
 		"destination_canonical_service":  "ratings",
 		"destination_canonical_revision": "v1",
 		"response_code":                  "200"}
-	q2m4 := model.Metric{
+	q3m4 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v2",
 		"source_canonical_service":       "reviews",
@@ -102,7 +105,7 @@ func TestResponseTime(t *testing.T) {
 		"destination_canonical_revision": "v1",
 		"response_code":                  "404", // should get tossed out on HTTP error
 		"grpc_response_status":           "0"}
-	q2m5 := model.Metric{
+	q3m5 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v2",
 		"source_canonical_service":       "reviews",
@@ -117,24 +120,24 @@ func TestResponseTime(t *testing.T) {
 		"response_code":                  "200",
 		"grpc_response_status":           "1"} // should get tossed out on GRPC error
 
-	v2 := model.Vector{
+	v3 := model.Vector{
 		&model.Sample{
-			Metric: q2m0,
+			Metric: q3m0,
 			Value:  0.020},
 		&model.Sample{
-			Metric: q2m1,
+			Metric: q3m1,
 			Value:  0.020},
 		&model.Sample{
-			Metric: q2m2,
+			Metric: q3m2,
 			Value:  0.030},
 		&model.Sample{
-			Metric: q2m3,
+			Metric: q3m3,
 			Value:  0.030},
 		&model.Sample{
-			Metric: q2m4,
+			Metric: q3m4,
 			Value:  0.001},
 		&model.Sample{
-			Metric: q2m5,
+			Metric: q3m5,
 			Value:  0.001}}
 
 	client, api, err := setupMocked()
@@ -145,6 +148,7 @@ func TestResponseTime(t *testing.T) {
 	mockQuery(api, q0, &v0)
 	mockQuery(api, q1, &v1)
 	mockQuery(api, q2, &v2)
+	mockQuery(api, q3, &v3)
 
 	trafficMap := responseTimeTestTraffic()
 	ingressID, _ := graph.Id(graph.Unknown, "istio-system", "", "istio-system", "ingressgateway-unknown", "ingressgateway", graph.Unknown, graph.GraphTypeVersionedApp)
