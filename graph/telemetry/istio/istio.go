@@ -228,8 +228,8 @@ func addTraffic(trafficMap graph.TrafficMap, direction string, val float64, prot
 	case graph.DirectionInbound:
 		graph.AddToMetadata(protocol, val, code, flags, host, nil, dest.Metadata, edge.Metadata)
 	case graph.DirectionOutbound:
-		// avoid doubling edge rates for intra-namespace traffic, use only inbound
-		if source.Namespace == dest.Namespace {
+		// avoid doubling edge rates for intra-cluster, intra-namespace traffic, use only inbound
+		if source.Cluster == dest.Cluster && source.Namespace == dest.Namespace {
 			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, nil, nil)
 		} else {
 			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, nil, edge.Metadata)
@@ -328,8 +328,8 @@ func addTCPTraffic(trafficMap graph.TrafficMap, direction string, val float64, f
 	if direction == graph.DirectionInbound {
 		graph.AddToMetadata("tcp", val, "", flags, host, nil, dest.Metadata, edge.Metadata)
 	} else {
-		// avoid doubling edge rates for intra-namespace traffic, use only inbound
-		if source.Namespace == dest.Namespace {
+		// avoid doubling edge rates for intra-cluster, intra-namespace traffic, use only inbound
+		if source.Cluster == dest.Cluster && source.Namespace == dest.Namespace {
 			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, nil, nil)
 		} else {
 			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, nil, edge.Metadata)
