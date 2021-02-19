@@ -80,7 +80,7 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 		idleCondition = ""
 	}
 
-	// 1) query destination telemetry to capture namespace services' incoming traffic
+	// 1) Incoming: query destination telemetry to capture namespace services' incoming traffic
 	query := fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
@@ -90,7 +90,7 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 	incomingVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
 	populateTrafficMap(trafficMap, &incomingVector, graph.DirectionIncoming, o)
 
-	// 2) query source telemetry to capture namespace workloads' outgoing traffic
+	// 2) Outgoing: query source telemetry to capture namespace workloads' outgoing traffic
 	query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
@@ -130,12 +130,6 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 func populateTrafficMap(trafficMap graph.TrafficMap, vector *model.Vector, direction string, o graph.TelemetryOptions) {
 	for _, s := range *vector {
 		val := float64(s.Value)
-
-		/* Now handled in the query
-		if !o.IncludeIdleEdges && val == 0 {
-			continue
-		}
-		*/
 
 		m := s.Metric
 		lSourceCluster, sourceClusterOk := m["source_cluster"]
@@ -227,7 +221,7 @@ func addTraffic(trafficMap graph.TrafficMap, direction string, val float64, prot
 		graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 	case graph.DirectionIncoming:
 		// for traffic originating outside set the outgoing traffic on the source node
-		if source.Cluster != dest.Cluster || source.Namespace != dest.Cluster {
+		if source.Cluster != dest.Cluster || source.Namespace != dest.Namespace {
 			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 		} else {
 			graph.AddToMetadata(protocol, val, code, flags, host, nil, dest.Metadata, edge.Metadata)
@@ -248,10 +242,6 @@ func addTraffic(trafficMap graph.TrafficMap, direction string, val float64, prot
 func populateTrafficMapTCP(trafficMap graph.TrafficMap, vector *model.Vector, direction string, o graph.TelemetryOptions) {
 	for _, s := range *vector {
 		val := float64(s.Value)
-
-		if !o.IncludeIdleEdges && val == 0 {
-			continue
-		}
 
 		m := s.Metric
 		lSourceCluster, sourceClusterOk := m["source_cluster"]
@@ -336,7 +326,7 @@ func addTCPTraffic(trafficMap graph.TrafficMap, direction string, val float64, f
 		graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 	case graph.DirectionIncoming:
 		// for traffic originating outside set the outgoing traffic on the source node
-		if source.Cluster != dest.Cluster || source.Namespace != dest.Cluster {
+		if source.Cluster != dest.Cluster || source.Namespace != dest.Namespace {
 			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 		} else {
 			graph.AddToMetadata("tcp", val, "", flags, host, nil, dest.Metadata, edge.Metadata)
