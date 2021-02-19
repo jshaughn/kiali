@@ -9,8 +9,8 @@ import (
 
 const (
 	DirectionBoth         string = "both"
-	DirectionInbound      string = "inbound"
-	DirectionOutbound     string = "outbound"
+	DirectionIncoming     string = "inbound"
+	DirectionOutgoing     string = "outbound"
 	GraphTypeApp          string = "app"
 	GraphTypeService      string = "service" // Treated as graphType Workload, with service injection, and then condensed
 	GraphTypeVersionedApp string = "versionedApp"

@@ -80,49 +80,49 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 		idleCondition = ""
 	}
 
-	// 1) query source telemetry to capture namespace workloads' outbound traffic
-	query := fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s) %s`,
+	// 1) query destination telemetry to capture namespace services' incoming traffic
+	query := fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy,
 		idleCondition)
-	outboundVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMap(trafficMap, &outboundVector, graph.DirectionOutbound, o)
+	incomingVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMap(trafficMap, &incomingVector, graph.DirectionIncoming, o)
 
-	// 2) query destination telemetry to capture namespace services' inbound traffic
-	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
+	// 2) query source telemetry to capture namespace workloads' outgoing traffic
+	query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy,
 		idleCondition)
-	inboundVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMap(trafficMap, &inboundVector, graph.DirectionInbound, o)
+	outgoingVector := promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMap(trafficMap, &outgoingVector, graph.DirectionOutgoing, o)
 
 	// TCP traffic
 	metric = "istio_tcp_sent_bytes_total"
 	groupBy = "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags"
 
-	// 1) query source telemetry to capture namespace workloads' outbound traffic
+	// 1) query destination telemetry to capture namespace services' incoming traffic	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
 	query = fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy,
 		idleCondition)
-	inboundVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMapTCP(trafficMap, &inboundVector, graph.DirectionInbound, o)
+	incomingVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMapTCP(trafficMap, &incomingVector, graph.DirectionIncoming, o)
 
-	// 2) query destination telemetry to capture namespace services' inbound traffic
-	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
+	// 2) query source telemetry to capture namespace workloads' outgoing traffic
+	query = fmt.Sprintf(`sum(rate(%s{reporter="source",source_workload_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy,
 		idleCondition)
-	outboundVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
-	populateTrafficMapTCP(trafficMap, &inboundVector, graph.DirectionOutbound, o)
+	outgoingVector = promQuery(query, time.Unix(o.QueryTime, 0), client.API())
+	populateTrafficMapTCP(trafficMap, &incomingVector, graph.DirectionOutgoing, o)
 
 	return trafficMap
 }
@@ -225,14 +225,20 @@ func addTraffic(trafficMap graph.TrafficMap, direction string, val float64, prot
 	switch direction {
 	case graph.DirectionBoth:
 		graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
-	case graph.DirectionInbound:
-		graph.AddToMetadata(protocol, val, code, flags, host, nil, dest.Metadata, edge.Metadata)
-	case graph.DirectionOutbound:
-		// avoid doubling edge rates for intra-cluster, intra-namespace traffic, use only inbound
-		if source.Cluster == dest.Cluster && source.Namespace == dest.Namespace {
-			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, nil, nil)
+	case graph.DirectionIncoming:
+		// for traffic originating outside set the outgoing traffic on the source node
+		if source.Cluster != dest.Cluster || source.Namespace != dest.Cluster {
+			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 		} else {
-			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, nil, edge.Metadata)
+			graph.AddToMetadata(protocol, val, code, flags, host, nil, dest.Metadata, edge.Metadata)
+		}
+	case graph.DirectionOutgoing:
+		// for traffic exiting the namespace set the incoming traffic on the dest node
+		if source.Cluster != dest.Cluster || source.Namespace != dest.Namespace {
+			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
+		} else {
+			// avoid doubling edge rates for traffic within the namespace, defer to inbound
+			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, nil, nil)
 		}
 	}
 
@@ -325,14 +331,23 @@ func addTCPTraffic(trafficMap graph.TrafficMap, direction string, val float64, f
 		edge.Metadata[graph.ProtocolKey] = "tcp"
 	}
 
-	if direction == graph.DirectionInbound {
-		graph.AddToMetadata("tcp", val, "", flags, host, nil, dest.Metadata, edge.Metadata)
-	} else {
-		// avoid doubling edge rates for intra-cluster, intra-namespace traffic, use only inbound
-		if source.Cluster == dest.Cluster && source.Namespace == dest.Namespace {
-			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, nil, nil)
+	switch direction {
+	case graph.DirectionBoth:
+		graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, dest.Metadata, edge.Metadata)
+	case graph.DirectionIncoming:
+		// for traffic originating outside set the outgoing traffic on the source node
+		if source.Cluster != dest.Cluster || source.Namespace != dest.Cluster {
+			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 		} else {
-			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, nil, edge.Metadata)
+			graph.AddToMetadata("tcp", val, "", flags, host, nil, dest.Metadata, edge.Metadata)
+		}
+	case graph.DirectionOutgoing:
+		// for traffic exiting the namespace set the incoming traffic on the dest node
+		if source.Cluster != dest.Cluster || source.Namespace != dest.Namespace {
+			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, dest.Metadata, edge.Metadata)
+		} else {
+			// avoid doubling edge rates for traffic within the namespace, defer to inbound
+			graph.AddToMetadata("tcp", val, "", flags, host, source.Metadata, nil, nil)
 		}
 	}
 
