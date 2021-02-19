@@ -2411,3 +2411,261 @@ func TestComplexGraph(t *testing.T) {
 	}
 	assert.Equal(t, 200, resp.StatusCode)
 }
+
+func TestMultiClusterSourceGraph(t *testing.T) {
+	// bookinfo
+	q0 := `round(sum(rate(istio_requests_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
+	q0m0 := model.Metric{
+		"destination_canonical_revision": "v2",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q0m1 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "details",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "details.bookinfo.svc.cluster.local",
+		"destination_service_name":       "details",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q0m2 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "productpage",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "productpage.bookinfo.svc.cluster.local",
+		"destination_service_name":       "productpage",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "productpage-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "latest",
+		"source_canonical_service":       "istio-ingressgateway",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "istio-ingressgateway",
+		"source_workload_namespace":      "istio-system"}
+	q0m3 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	v0 := model.Vector{
+		&model.Sample{
+			Metric: q0m0,
+			Value:  100},
+		&model.Sample{
+			Metric: q0m1,
+			Value:  100},
+		&model.Sample{
+			Metric: q0m2,
+			Value:  100},
+		&model.Sample{
+			Metric: q0m3,
+			Value:  100},
+	}
+
+	q1 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
+	q1m0 := model.Metric{
+		"destination_canonical_revision": "v3",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "tzotz",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v3",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q1m1 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "ratings",
+		"destination_cluster":            "tzotz",
+		"destination_service":            "ratings.bookinfo.svc.cluster.local",
+		"destination_service_name":       "ratings",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "ratings-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v2",
+		"source_canonical_service":       "reviews",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "reviews-v2",
+		"source_workload_namespace":      "bookinfo"}
+	q1m2 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "details",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "details.bookinfo.svc.cluster.local",
+		"destination_service_name":       "details",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q1m3 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q1m4 := model.Metric{
+		"destination_canonical_revision": "v2",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q1m5 := model.Metric{
+		"destination_canonical_revision": "v2",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "tzotz",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	v1 := model.Vector{
+		&model.Sample{
+			Metric: q1m0,
+			Value:  100},
+		&model.Sample{
+			Metric: q1m1,
+			Value:  100},
+		&model.Sample{
+			Metric: q1m2,
+			Value:  100},
+		&model.Sample{
+			Metric: q1m3,
+			Value:  100},
+		&model.Sample{
+			Metric: q1m4,
+			Value:  100},
+		&model.Sample{
+			Metric: q1m5,
+			Value:  100},
+	}
+
+	q2 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
+	v2 := model.Vector{}
+
+	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
+	v3 := model.Vector{}
+
+	client, xapi, _, err := setupMockedWithIstioComponentNamespaces()
+	if err != nil {
+		t.Error(err)
+		return
+	}
+	mockQuery(xapi, q0, &v0)
+	mockQuery(xapi, q1, &v1)
+	mockQuery(xapi, q2, &v2)
+	mockQuery(xapi, q3, &v3)
+
+	var fut func(b *business.Layer, p *prometheus.Client, o graph.Options) (int, interface{})
+
+	mr := mux.NewRouter()
+	mr.HandleFunc("/api/namespaces/graph", http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			context := context.WithValue(r.Context(), "authInfo", &api.AuthInfo{Token: "test"})
+			code, config := fut(nil, client, graph.NewOptions(r.WithContext(context)))
+			respond(w, code, config)
+		}))
+
+	ts := httptest.NewServer(mr)
+	defer ts.Close()
+
+	fut = graphNamespacesIstio
+	url := ts.URL + "/api/namespaces/graph?graphType=versionedApp&injectServiceNodes=true&includeIdleEdges=true&appenders=&queryTime=1523364075&namespaces=bookinfo"
+	resp, err := http.Get(url)
+	if err != nil {
+		t.Fatal(err)
+	}
+	actual, _ := ioutil.ReadAll(resp.Body)
+	expected, _ := ioutil.ReadFile("testdata/test_mc_source_graph.expected")
+	if runtime.GOOS == "windows" {
+		expected = bytes.Replace(expected, []byte("\r\n"), []byte("\n"), -1)
+	}
+	expected = expected[:len(expected)-1] // remove EOF byte
+
+	if !assert.Equal(t, expected, actual) {
+		fmt.Printf("\nActual:\n%v", string(actual))
+	}
+	assert.Equal(t, 200, resp.StatusCode)
+}

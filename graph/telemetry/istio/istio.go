@@ -189,16 +189,17 @@ func populateTrafficMap(trafficMap graph.TrafficMap, vector *model.Vector, direc
 			_, destNodeType := graph.Id(destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o.GraphType)
 			inject = (graph.NodeTypeService != destNodeType)
 		}
+		inNamespace := sourceCluster == destCluster && sourceWlNs == destSvcNs
 		if inject {
-			addTraffic(trafficMap, direction, val, protocol, code, flags, host, sourceCluster, sourceWlNs, "", sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, "", "", "", "", o)
-			addTraffic(trafficMap, direction, val, protocol, code, flags, host, destCluster, destSvcNs, destSvcName, "", "", "", destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o)
+			addTraffic(trafficMap, direction, inNamespace, val, protocol, code, flags, host, sourceCluster, sourceWlNs, "", sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, "", "", "", "", o)
+			addTraffic(trafficMap, direction, inNamespace, val, protocol, code, flags, host, destCluster, destSvcNs, destSvcName, "", "", "", destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o)
 		} else {
-			addTraffic(trafficMap, direction, val, protocol, code, flags, host, sourceCluster, sourceWlNs, "", sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o)
+			addTraffic(trafficMap, direction, inNamespace, val, protocol, code, flags, host, sourceCluster, sourceWlNs, "", sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o)
 		}
 	}
 }
 
-func addTraffic(trafficMap graph.TrafficMap, direction string, val float64, protocol, code, flags, host, sourceCluster, sourceNs, sourceSvc, sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer string, o graph.TelemetryOptions) (source, dest *graph.Node) {
+func addTraffic(trafficMap graph.TrafficMap, direction string, inNamespace bool, val float64, protocol, code, flags, host, sourceCluster, sourceNs, sourceSvc, sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer string, o graph.TelemetryOptions) (source, dest *graph.Node) {
 	source, _ = addNode(trafficMap, sourceCluster, sourceNs, sourceSvc, sourceNs, sourceWl, sourceApp, sourceVer, o)
 	dest, _ = addNode(trafficMap, destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o)
 
@@ -221,14 +222,14 @@ func addTraffic(trafficMap graph.TrafficMap, direction string, val float64, prot
 		graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 	case graph.DirectionIncoming:
 		// for traffic originating outside set the outgoing traffic on the source node
-		if source.Cluster != dest.Cluster || source.Namespace != dest.Namespace {
+		if !inNamespace {
 			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 		} else {
 			graph.AddToMetadata(protocol, val, code, flags, host, nil, dest.Metadata, edge.Metadata)
 		}
 	case graph.DirectionOutgoing:
 		// for traffic exiting the namespace set the incoming traffic on the dest node
-		if source.Cluster != dest.Cluster || source.Namespace != dest.Namespace {
+		if !inNamespace {
 			graph.AddToMetadata(protocol, val, code, flags, host, source.Metadata, dest.Metadata, edge.Metadata)
 		} else {
 			// avoid doubling edge rates for traffic within the namespace, defer to inbound
