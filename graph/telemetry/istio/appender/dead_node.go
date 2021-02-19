@@ -28,6 +28,13 @@ func (a DeadNodeAppender) AppendGraph(trafficMap graph.TrafficMap, globalInfo *g
 		return
 	}
 
+	if globalInfo.HomeCluster == "" {
+		globalInfo.HomeCluster = "unknown"
+		if c, err := globalInfo.Business.Mesh.ResolveKialiControlPlaneCluster(); c != nil && err == nil {
+			globalInfo.HomeCluster = c.Name
+		}
+	}
+
 	if getWorkloadList(namespaceInfo) == nil {
 		workloadList, err := globalInfo.Business.Workload.GetWorkloadList(namespaceInfo.Namespace)
 		graph.CheckError(err)
@@ -67,6 +74,11 @@ func (a DeadNodeAppender) applyDeadNodes(trafficMap graph.TrafficMap, globalInfo
 			}
 		}
 		if !isDead {
+			continue
+		}
+
+		// a node from a remote cluster is not considered dead, assume the best for it
+		if n.Cluster != globalInfo.HomeCluster {
 			continue
 		}
 
