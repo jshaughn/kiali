@@ -48,7 +48,7 @@
             {
               "protocol": "http",
               "rates": {
-                "httpIn": "50.00"
+                "httpIn": "100.00"
               }
             }
           ]
