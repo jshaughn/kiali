@@ -105,7 +105,7 @@ func buildNamespaceTrafficMap(namespace string, o graph.TelemetryOptions, client
 	groupBy = "source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags"
 
 	// 1) query destination telemetry to capture namespace services' incoming traffic	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
-	query = fmt.Sprintf(`sum(rate(%s{reporter="source",destination_workload_namespace="%s"} [%vs])) by (%s) %s`,
+	query = fmt.Sprintf(`sum(rate(%s{reporter="destination",destination_service_namespace="%s"} [%vs])) by (%s) %s`,
 		metric,
 		namespace,
 		int(duration.Seconds()), // range duration for the query
