@@ -27,6 +27,9 @@ var (
 // is represented as a percentile value. The default is 95th percentile, which means that
 // 95% of requests executed in no more than the resulting milliseconds. ResponeTime values are
 // reported in milliseconds.
+// Response Times are reported using destination proxy telemetry, when available, which should remove
+// network latency fluctuations.
+// TODO: Should we report both source and destination when possible?
 // Name: responseTime
 type ResponseTimeAppender struct {
 	GraphType          string
@@ -63,57 +66,35 @@ func (a ResponseTimeAppender) appendGraph(trafficMap graph.TrafficMap, namespace
 		quantile = defaultQuantile
 	}
 	log.Tracef("Generating responseTime using quantile [%.2f]; namespace = %v", quantile, namespace)
-	duration := a.Namespaces[namespace].Duration
 
 	// create map to quickly look up responseTime
 	responseTimeMap := make(map[string]float64)
+	duration := a.Namespaces[namespace].Duration
 
 	// query prometheus for the responseTime info in four queries:
 	groupBy := "le,source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_code,grpc_response_status"
 
-	// Source telemetry is used only to capture [failed] requests that did not reach a destination workload
-	// 1) query source telemetry for requests from outside the namespace that could not be serviced
-	query := fmt.Sprintf(`histogram_quantile(%.2f, sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace!="%s",destination_service=~"^.*\\.%s\\..*$"}[%vs])) by (%s)) > 0`,
+	// 1) Incoming: query destination telemetry to capture namespace services' incoming traffic
+	// note - the query order is important as both queries may have overlapping results for edges within
+	//        the namespace.  This query uses destination proxy and so must come first.
+	query := fmt.Sprintf(`histogram_quantile(%.2f, sum(rate(%s{reporter="destination",destination_service_namespace="%s"}[%vs])) by (%s)) > 0`,
 		quantile,
 		"istio_request_duration_milliseconds_bucket",
 		namespace,
-		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy)
-	vector := promQuery(query, time.Unix(a.QueryTime, 0), client.GetContext(), client.API(), a)
-	a.populateResponseTimeMap(responseTimeMap, &vector)
+	incomingVector := promQuery(query, time.Unix(a.QueryTime, 0), client.GetContext(), client.API(), a)
+	a.populateResponseTimeMap(responseTimeMap, &incomingVector)
 
-	// 2) query source telemetry for requests from namespace workloads that could not be serviced
-	query = fmt.Sprintf(`histogram_quantile(%.2f, sum(rate(%s{reporter="source",destination_workload="unknown",source_workload_namespace="%s"}[%vs])) by (%s)) > 0`,
+	// 2) Outgoing: query source telemetry to capture namespace workloads' outgoing traffic
+	query = fmt.Sprintf(`histogram_quantile(%.2f, sum(rate(%s{reporter="source",source_workload_namespace="%s"}[%vs])) by (%s)) > 0`,
 		quantile,
 		"istio_request_duration_milliseconds_bucket",
 		namespace,
 		int(duration.Seconds()), // range duration for the query
 		groupBy)
-	vector = promQuery(query, time.Unix(a.QueryTime, 0), client.GetContext(), client.API(), a)
-	a.populateResponseTimeMap(responseTimeMap, &vector)
-
-	// Destination telemetry is used to capture all other relevant requests. It is noteworthy to realize that a single request from
-	// 3) query dest telemetry for requests from outside the namespace and serviced by namespace workloads
-	query = fmt.Sprintf(`histogram_quantile(%.2f, sum(rate(%s{reporter="destination",destination_workload_namespace="%s",source_workload_namespace!="%s"}[%vs])) by (%s)) > 0`,
-		quantile,
-		"istio_request_duration_milliseconds_bucket",
-		namespace,
-		namespace,
-		int(duration.Seconds()), // range duration for the query
-		groupBy)
-	vector = promQuery(query, time.Unix(a.QueryTime, 0), client.GetContext(), client.API(), a)
-	a.populateResponseTimeMap(responseTimeMap, &vector)
-
-	// 4) query dest telemetry for requests made by namespace workloads and serviced by a destination workload
-	query = fmt.Sprintf(`histogram_quantile(%.2f, sum(rate(%s{reporter="destination",source_workload_namespace="%s"}[%vs])) by (%s)) > 0`,
-		quantile,
-		"istio_request_duration_milliseconds_bucket",
-		namespace,
-		int(duration.Seconds()), // range duration for the query
-		groupBy)
-	vector = promQuery(query, time.Unix(a.QueryTime, 0), client.GetContext(), client.API(), a)
-	a.populateResponseTimeMap(responseTimeMap, &vector)
+	outgoingVector := promQuery(query, time.Unix(a.QueryTime, 0), client.GetContext(), client.API(), a)
+	a.populateResponseTimeMap(responseTimeMap, &outgoingVector)
 
 	applyResponseTime(trafficMap, responseTimeMap)
 }
@@ -174,7 +155,7 @@ func (a ResponseTimeAppender) populateResponseTimeMap(responseTimeMap map[string
 		}
 
 		// Only valid requests contribute to response time so as not to skew RT when a failed request returns immediately
-		// TODO: Note, we can do this filtering in the queries when and if all supported Istio versions provide grpc_response_status
+		// TODO: Maybe we should control this behavior with a queryParam?
 		if grpcReponseStatus != "0" || regexpHTTPFailure.MatchString(responseCode) {
 			continue
 		}
@@ -199,6 +180,7 @@ func (a ResponseTimeAppender) populateResponseTimeMap(responseTimeMap map[string
 			_, destNodeType := graph.Id(destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, a.GraphType)
 			inject = (graph.NodeTypeService != destNodeType)
 		}
+
 		if inject {
 			// Do not set response time on the incoming edge, we can't validly aggregate response times of the outgoing edges (kiali-2297)
 			a.addResponseTime(responseTimeMap, val, destCluster, destSvcNs, destSvcName, "", "", "", destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer)
@@ -213,5 +195,9 @@ func (a ResponseTimeAppender) addResponseTime(responseTimeMap map[string]float64
 	destID, _ := graph.Id(destCluster, destSvcNs, destSvc, destWlNs, destWl, destApp, destVer, a.GraphType)
 	key := fmt.Sprintf("%s %s", sourceID, destID)
 
-	responseTimeMap[key] = val
+	// For edges within the namespace we may get a responseTime reported from both the incoming and outgoing
+	// traffic queries.  We assume here the first reported value is preferred (i.e. defer to query order)
+	if _, found := responseTimeMap[key]; !found {
+		responseTimeMap[key] = val
+	}
 }
