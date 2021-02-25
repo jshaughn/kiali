@@ -173,8 +173,11 @@ func mockQuery(api *prometheustest.PromAPIMock, query string, ret *model.Vector)
 
 // mockNamespaceGraph provides the same single-namespace mocks to be used for different graph types
 func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
-	q0 := `round(sum(rate(istio_requests_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	q0m0 := model.Metric{
+	q0 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace!="bookinfo",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.bookinfo\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	v0 := model.Vector{}
+
+	q1 := `round(sum(rate(istio_requests_total{reporter="destination",destination_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q1m0 := model.Metric{
 		"source_workload_namespace":      "istio-system",
 		"source_workload":                "ingressgateway-unknown",
 		"source_canonical_service":       "ingressgateway",
@@ -190,7 +193,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q0m1 := model.Metric{
+	q1m1 := model.Metric{
 		"source_workload_namespace":      "unknown",
 		"source_workload":                "unknown",
 		"source_canonical_service":       "unknown",
@@ -206,7 +209,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q0m2 := model.Metric{
+	q1m2 := model.Metric{
 		"source_workload_namespace":      "unknown",
 		"source_workload":                "unknown",
 		"source_canonical_service":       "unknown",
@@ -222,341 +225,21 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q0m3 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v1",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m4 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v2",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v2",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m5 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v3",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v3",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m6 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "300",
-		"response_flags":                 "-"}
-	q0m7 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "400",
-		"response_flags":                 "-"}
-	q0m8 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "500",
-		"response_flags":                 "-"}
-	q0m9 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m10 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "productpage:9080",
-		"destination_service_name":       "productpage",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "productpage-v1",
-		"destination_canonical_service":  "productpage",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m11 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v2",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v2",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "ratings:9080",
-		"destination_service_name":       "ratings",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "ratings-v1",
-		"destination_canonical_service":  "ratings",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m12 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v2",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v2",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "ratings:9080",
-		"destination_service_name":       "ratings",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "ratings-v1",
-		"destination_canonical_service":  "ratings",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "500",
-		"response_flags":                 "-"}
-	q0m13 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v2",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v2",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v2",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v2",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m14 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v3",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v3",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "ratings:9080",
-		"destination_service_name":       "ratings",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "ratings-v1",
-		"destination_canonical_service":  "ratings",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q0m15 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v3",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v3",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "ratings:9080",
-		"destination_service_name":       "ratings",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "ratings-v1",
-		"destination_canonical_service":  "ratings",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "500",
-		"response_flags":                 "-"}
-	q0m16 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v3",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v3",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v3",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v3",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	v0 := model.Vector{
-		&model.Sample{
-			Metric: q0m0,
-			Value:  100},
-		&model.Sample{
-			Metric: q0m1,
-			Value:  50},
-		&model.Sample{
-			Metric: q0m2,
-			Value:  50},
-		&model.Sample{
-			Metric: q0m3,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m4,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m5,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m6,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m7,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m8,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m9,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m10,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m11,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m12,
-			Value:  10},
-		&model.Sample{
-			Metric: q0m13,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m14,
-			Value:  20},
-		&model.Sample{
-			Metric: q0m15,
-			Value:  10},
-		&model.Sample{
-			Metric: q0m16,
-			Value:  20}}
-
-	q1 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	q1m0 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v1",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q1m1 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v2",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v2",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q1m2 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "productpage-v1",
-		"source_canonical_service":       "productpage",
-		"source_canonical_revision":      "v1",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews:9080",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v3",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v3",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
 	q1m3 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "productpage-v1",
 		"source_canonical_service":       "productpage",
 		"source_canonical_revision":      "v1",
 		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
 		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
+		"destination_workload":           "reviews-v1",
+		"destination_canonical_service":  "reviews",
 		"destination_canonical_revision": "v1",
 		"request_protocol":               "http",
-		"response_code":                  "300",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
 	q1m4 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
@@ -564,14 +247,15 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"source_canonical_service":       "productpage",
 		"source_canonical_revision":      "v1",
 		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
 		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
-		"destination_canonical_revision": "v1",
+		"destination_workload":           "reviews-v2",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v2",
 		"request_protocol":               "http",
-		"response_code":                  "400",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
 	q1m5 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
@@ -579,14 +263,15 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"source_canonical_service":       "productpage",
 		"source_canonical_revision":      "v1",
 		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "details:9080",
-		"destination_service_name":       "details",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
 		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_canonical_service":  "details",
-		"destination_canonical_revision": "v1",
+		"destination_workload":           "reviews-v3",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v3",
 		"request_protocol":               "http",
-		"response_code":                  "500",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
 	q1m6 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
@@ -601,10 +286,55 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"destination_canonical_service":  "details",
 		"destination_canonical_revision": "v1",
 		"request_protocol":               "http",
+		"response_code":                  "300",
+		"response_flags":                 "-"}
+	q1m7 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "400",
+		"response_flags":                 "-"}
+	q1m8 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "500",
+		"response_flags":                 "-"}
+	q1m9 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q1m7 := model.Metric{
+	q1m10 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "productpage-v1",
 		"source_canonical_service":       "productpage",
@@ -620,7 +350,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q1m8 := model.Metric{
+	q1m11 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v2",
 		"source_canonical_service":       "reviews",
@@ -636,7 +366,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q1m9 := model.Metric{
+	q1m12 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v2",
 		"source_canonical_service":       "reviews",
@@ -651,7 +381,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"request_protocol":               "http",
 		"response_code":                  "500",
 		"response_flags":                 "-"}
-	q1m10 := model.Metric{
+	q1m13 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v2",
 		"source_canonical_service":       "reviews",
@@ -667,7 +397,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q1m11 := model.Metric{
+	q1m14 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v3",
 		"source_canonical_service":       "reviews",
@@ -683,7 +413,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q1m12 := model.Metric{
+	q1m15 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v3",
 		"source_canonical_service":       "reviews",
@@ -698,7 +428,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"request_protocol":               "http",
 		"response_code":                  "500",
 		"response_flags":                 "-"}
-	q1m13 := model.Metric{
+	q1m16 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "reviews-v3",
 		"source_canonical_service":       "reviews",
@@ -714,47 +444,16 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q1m14 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v3",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v3",
-		"destination_service_namespace":  "bankapp",
-		"destination_service":            "pricing:9080",
-		"destination_service_name":       "pricing",
-		"destination_workload_namespace": "bankapp",
-		"destination_workload":           "pricing-v1",
-		"destination_canonical_service":  "pricing",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"grpc_response_status":           "0",
-		"response_flags":                 "-"}
-	q1m15 := model.Metric{
-		"source_workload_namespace":      "bookinfo",
-		"source_workload":                "reviews-v3",
-		"source_canonical_service":       "reviews",
-		"source_canonical_revision":      "v3",
-		"destination_service_namespace":  "unknown",
-		"destination_service":            "unknown",
-		"destination_service_name":       "unknown",
-		"destination_workload_namespace": "unknown",
-		"destination_workload":           "unknown",
-		"destination_canonical_service":  "unknown",
-		"destination_canonical_revision": "unknown",
-		"request_protocol":               "http",
-		"response_code":                  "404",
-		"response_flags":                 "NR"}
 	v1 := model.Vector{
 		&model.Sample{
 			Metric: q1m0,
-			Value:  20},
+			Value:  100},
 		&model.Sample{
 			Metric: q1m1,
-			Value:  20},
+			Value:  50},
 		&model.Sample{
 			Metric: q1m2,
-			Value:  20},
+			Value:  50},
 		&model.Sample{
 			Metric: q1m3,
 			Value:  20},
@@ -775,7 +474,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 			Value:  20},
 		&model.Sample{
 			Metric: q1m9,
-			Value:  10},
+			Value:  20},
 		&model.Sample{
 			Metric: q1m10,
 			Value:  20},
@@ -793,10 +492,317 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 			Value:  20},
 		&model.Sample{
 			Metric: q1m15,
+			Value:  10},
+		&model.Sample{
+			Metric: q1m16,
+			Value:  20}}
+
+	q2 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q2m0 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "reviews-v1",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m1 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v2",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m2 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "reviews-v3",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v3",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m3 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "300",
+		"response_flags":                 "-"}
+	q2m4 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "400",
+		"response_flags":                 "-"}
+	q2m5 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "500",
+		"response_flags":                 "-"}
+	q2m6 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "details:9080",
+		"destination_service_name":       "details",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_canonical_service":  "details",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m7 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "productpage-v1",
+		"source_canonical_service":       "productpage",
+		"source_canonical_revision":      "v1",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "productpage:9080",
+		"destination_service_name":       "productpage",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "productpage-v1",
+		"destination_canonical_service":  "productpage",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m8 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v2",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v2",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "ratings:9080",
+		"destination_service_name":       "ratings",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "ratings-v1",
+		"destination_canonical_service":  "ratings",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m9 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v2",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v2",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "ratings:9080",
+		"destination_service_name":       "ratings",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "ratings-v1",
+		"destination_canonical_service":  "ratings",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "500",
+		"response_flags":                 "-"}
+	q2m10 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v2",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v2",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v2",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m11 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v3",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v3",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "ratings:9080",
+		"destination_service_name":       "ratings",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "ratings-v1",
+		"destination_canonical_service":  "ratings",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m12 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v3",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v3",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "ratings:9080",
+		"destination_service_name":       "ratings",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "ratings-v1",
+		"destination_canonical_service":  "ratings",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "500",
+		"response_flags":                 "-"}
+	q2m13 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v3",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v3",
+		"destination_service_namespace":  "bookinfo",
+		"destination_service":            "reviews:9080",
+		"destination_service_name":       "reviews",
+		"destination_workload_namespace": "bookinfo",
+		"destination_workload":           "reviews-v3",
+		"destination_canonical_service":  "reviews",
+		"destination_canonical_revision": "v3",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m14 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v3",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v3",
+		"destination_service_namespace":  "bankapp",
+		"destination_service":            "pricing:9080",
+		"destination_service_name":       "pricing",
+		"destination_workload_namespace": "bankapp",
+		"destination_workload":           "pricing-v1",
+		"destination_canonical_service":  "pricing",
+		"destination_canonical_revision": "v1",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"grpc_response_status":           "0",
+		"response_flags":                 "-"}
+	q2m15 := model.Metric{
+		"source_workload_namespace":      "bookinfo",
+		"source_workload":                "reviews-v3",
+		"source_canonical_service":       "reviews",
+		"source_canonical_revision":      "v3",
+		"destination_service_namespace":  "unknown",
+		"destination_service":            "unknown",
+		"destination_service_name":       "unknown",
+		"destination_workload_namespace": "unknown",
+		"destination_workload":           "unknown",
+		"destination_canonical_service":  "unknown",
+		"destination_canonical_revision": "unknown",
+		"request_protocol":               "http",
+		"response_code":                  "404",
+		"response_flags":                 "NR"}
+	v2 := model.Vector{
+		&model.Sample{
+			Metric: q2m0,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m1,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m2,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m3,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m4,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m5,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m6,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m7,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m8,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m9,
+			Value:  10},
+		&model.Sample{
+			Metric: q2m10,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m11,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m12,
+			Value:  10},
+		&model.Sample{
+			Metric: q2m13,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m14,
+			Value:  20},
+		&model.Sample{
+			Metric: q2m15,
 			Value:  4}}
 
-	q2 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
-	q2m0 := model.Metric{
+	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace!="bookinfo",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.bookinfo\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v3 := model.Vector{}
+
+	q4 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	q4m0 := model.Metric{
 		"source_workload_namespace":      "istio-system",
 		"source_workload":                "ingressgateway-unknown",
 		"source_canonical_service":       "ingressgateway",
@@ -809,7 +815,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"destination_canonical_service":  "tcp",
 		"destination_canonical_revision": "v1",
 		"response_flags":                 "-"}
-	q2m1 := model.Metric{
+	q4m1 := model.Metric{
 		"source_workload_namespace":      "unknown",
 		"source_workload":                "unknown",
 		"source_canonical_service":       "unknown",
@@ -822,7 +828,7 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"destination_canonical_service":  "tcp",
 		"destination_canonical_revision": "v1",
 		"response_flags":                 "-"}
-	q2m2 := model.Metric{
+	q4m2 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "productpage-v1",
 		"source_canonical_service":       "productpage",
@@ -835,19 +841,19 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"destination_canonical_service":  "tcp",
 		"destination_canonical_revision": "v1",
 		"response_flags":                 "-"}
-	v2 := model.Vector{
+	v4 := model.Vector{
 		&model.Sample{
-			Metric: q2m0,
+			Metric: q4m0,
 			Value:  150},
 		&model.Sample{
-			Metric: q2m1,
+			Metric: q4m1,
 			Value:  400},
 		&model.Sample{
-			Metric: q2m2,
+			Metric: q4m2,
 			Value:  31}}
 
-	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
-	q3m0 := model.Metric{
+	q5 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	q5m0 := model.Metric{
 		"source_workload_namespace":      "bookinfo",
 		"source_workload":                "productpage-v1",
 		"source_canonical_service":       "productpage",
@@ -860,9 +866,9 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 		"destination_canonical_service":  "tcp",
 		"destination_canonical_revision": "v1",
 		"response_flags":                 "-"}
-	v3 := model.Vector{
+	v5 := model.Vector{
 		&model.Sample{
-			Metric: q3m0,
+			Metric: q5m0,
 			Value:  31}}
 
 	client, api, _, err := setupMocked()
@@ -874,6 +880,8 @@ func mockNamespaceGraph(t *testing.T) (*prometheus.Client, error) {
 	mockQuery(api, q1, &v1)
 	mockQuery(api, q2, &v2)
 	mockQuery(api, q3, &v3)
+	mockQuery(api, q4, &v4)
+	mockQuery(api, q5, &v5)
 
 	return client, nil
 }
@@ -1976,8 +1984,32 @@ func TestServiceNodeGraph(t *testing.T) {
 // note: appenders still tested in separate unit tests given that they create their own new business/kube clients
 func TestComplexGraph(t *testing.T) {
 	// bookinfo
-	q0 := `round(sum(rate(istio_requests_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	q0m0 := model.Metric{
+	q0 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace!="bookinfo",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.bookinfo\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q0m0 := model.Metric{ // outsider request that fais to reach workload
+		"source_cluster":                 "cluster-tutorial",
+		"source_workload_namespace":      "outsider",
+		"source_workload":                "outsider-ingress",
+		"source_canonical_service":       "outsider-ingress",
+		"source_canonical_revision":      "latest",
+		"destination_cluster":            "unknown", // this reflects real ingress reporting at this time,
+		"destination_service_namespace":  "unknown", // although it seems like a possible bug to me
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_workload_namespace": "unknown",
+		"destination_workload":           "unknown",
+		"destination_canonical_service":  "unknown",
+		"destination_canonical_revision": "latest",
+		"request_protocol":               "http",
+		"response_code":                  "503",
+		"response_flags":                 "-"}
+	v0 := model.Vector{
+		&model.Sample{
+			Metric: q0m0,
+			Value:  50},
+	}
+
+	q1 := `round(sum(rate(istio_requests_total{reporter="destination",destination_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q1m0 := model.Metric{
 		"source_cluster":                 "unknown",
 		"source_workload_namespace":      "unknown",
 		"source_workload":                "unknown",
@@ -1995,7 +2027,7 @@ func TestComplexGraph(t *testing.T) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q0m1 := model.Metric{
+	q1m1 := model.Metric{
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2013,7 +2045,7 @@ func TestComplexGraph(t *testing.T) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q0m2 := model.Metric{ // bad dest telem (variant 1.0)
+	q1m2 := model.Metric{ // bad dest telem (variant 1.0)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2030,7 +2062,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q0m3 := model.Metric{ // bad dest telem (variant 1.2)
+	q1m3 := model.Metric{ // bad dest telem (variant 1.2)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2047,7 +2079,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q0m4 := model.Metric{ // good telem (mock service entry)
+	q1m4 := model.Metric{ // good telem (mock service entry)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2064,7 +2096,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q0m5 := model.Metric{ // bad dest telem (variant 2.1)
+	q1m5 := model.Metric{ // bad dest telem (variant 2.1)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2081,39 +2113,45 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	v0 := model.Vector{
+	v1 := model.Vector{
 		&model.Sample{
-			Metric: q0m0,
+			Metric: q1m0,
 			Value:  50},
 		&model.Sample{
-			Metric: q0m1,
+			Metric: q1m1,
 			Value:  50},
 		&model.Sample{
-			Metric: q0m2,
+			Metric: q1m2,
 			Value:  100},
 		&model.Sample{
-			Metric: q0m3,
+			Metric: q1m3,
 			Value:  200},
 		&model.Sample{
-			Metric: q0m4,
+			Metric: q1m4,
 			Value:  300},
 		&model.Sample{
-			Metric: q0m5,
+			Metric: q1m5,
 			Value:  700},
 	}
 
-	q1 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	v1 := model.Vector{}
-
-	q2 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	q2 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
 	v2 := model.Vector{}
 
-	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace!="bookinfo",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.bookinfo\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
 	v3 := model.Vector{}
 
+	q4 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v4 := model.Vector{}
+
+	q5 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v5 := model.Vector{}
+
 	// tutorial
-	q4 := `round(sum(rate(istio_requests_total{reporter="destination",destination_service_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	q4m0 := model.Metric{
+	q6 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace!="tutorial",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.tutorial\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	v6 := model.Vector{}
+
+	q7 := `round(sum(rate(istio_requests_total{reporter="destination",destination_workload_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q7m0 := model.Metric{
 		"source_cluster":                 "unknown",
 		"source_workload_namespace":      "unknown",
 		"source_workload":                "unknown",
@@ -2131,7 +2169,7 @@ func TestComplexGraph(t *testing.T) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q4m1 := model.Metric{
+	q7m1 := model.Metric{
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "bad-source-telemetry-case-1",
 		"source_workload":                "unknown",
@@ -2149,17 +2187,17 @@ func TestComplexGraph(t *testing.T) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	v4 := model.Vector{
+	v7 := model.Vector{
 		&model.Sample{
-			Metric: q4m0,
+			Metric: q7m0,
 			Value:  50},
 		&model.Sample{
-			Metric: q4m1,
+			Metric: q7m1,
 			Value:  50},
 	}
 
-	q5 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	q5m0 := model.Metric{
+	q8 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q8m0 := model.Metric{
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2177,7 +2215,7 @@ func TestComplexGraph(t *testing.T) {
 		"response_code":                  "200",
 		"grpc_response_status":           "0",
 		"response_flags":                 "-"}
-	q5m1 := model.Metric{ // bad dest telem (variant 1.0)
+	q8m1 := model.Metric{ // bad dest telem (variant 1.0)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2194,7 +2232,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q5m2 := model.Metric{ // bad dest telem (variant 1.2)
+	q8m2 := model.Metric{ // bad dest telem (variant 1.2)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2211,7 +2249,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q5m3 := model.Metric{ // good telem (mock service entry)
+	q8m3 := model.Metric{ // good telem (mock service entry)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2228,7 +2266,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q5m4 := model.Metric{ // good telem (service entry via egressgateway, see the second hop below)
+	q8m4 := model.Metric{ // good telem (service entry via egressgateway, see the second hop below)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2245,7 +2283,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q5m5 := model.Metric{ // no response http
+	q8m5 := model.Metric{ // no response http
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2262,7 +2300,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "0",
 		"response_flags":                 "DC"}
-	q5m6 := model.Metric{ // no response grpc
+	q8m6 := model.Metric{ // no response grpc
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2279,7 +2317,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "grpc",
 		"response_code":                  "0", // note, grpc_response_status is not reported for grpc with no response
 		"response_flags":                 "DC"}
-	q5m7 := model.Metric{ // bad dest telem (variant 2.1)
+	q8m7 := model.Metric{ // bad dest telem (variant 2.1)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2296,45 +2334,51 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	v5 := model.Vector{
+	v8 := model.Vector{
 		&model.Sample{
-			Metric: q5m0,
+			Metric: q8m0,
 			Value:  50},
 		&model.Sample{
-			Metric: q5m1,
+			Metric: q8m1,
 			Value:  100},
 		&model.Sample{
-			Metric: q5m2,
+			Metric: q8m2,
 			Value:  200},
 		&model.Sample{
-			Metric: q5m3,
+			Metric: q8m3,
 			Value:  300},
 		&model.Sample{
-			Metric: q5m4,
+			Metric: q8m4,
 			Value:  400},
 		&model.Sample{
-			Metric: q5m5,
+			Metric: q8m5,
 			Value:  500},
 		&model.Sample{
-			Metric: q5m6,
+			Metric: q8m6,
 			Value:  600},
 		&model.Sample{
-			Metric: q5m7,
+			Metric: q8m7,
 			Value:  700},
 	}
 
-	q6 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_service_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
-	v6 := model.Vector{}
+	q9 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace!="tutorial",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.tutorial\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v9 := model.Vector{}
 
-	q7 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
-	v7 := model.Vector{}
+	q10 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_workload_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v10 := model.Vector{}
+
+	q11 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="tutorial"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v11 := model.Vector{}
 
 	// istio-system
-	q8 := `round(sum(rate(istio_requests_total{reporter="destination",destination_service_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	v8 := model.Vector{}
+	q12 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace!="istio-system",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.istio-system\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	v12 := model.Vector{}
 
-	q9 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
-	q9m0 := model.Metric{ // good telem (service entry via egressgateway, the second hop)
+	q13 := `round(sum(rate(istio_requests_total{reporter="destination",destination_workload_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	v13 := model.Vector{}
+
+	q14 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
+	q14m0 := model.Metric{ // good telem (service entry via egressgateway, the second hop)
 		"source_cluster":                 "cluster-cp",
 		"source_workload_namespace":      "istio-system",
 		"source_workload":                "istio-egressgateway",
@@ -2351,16 +2395,19 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	v9 := model.Vector{
+	v14 := model.Vector{
 		&model.Sample{
-			Metric: q9m0,
+			Metric: q14m0,
 			Value:  400}}
 
-	q10 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_service_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
-	v10 := model.Vector{}
+	q15 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace!="istio-system",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.istio-system\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v15 := model.Vector{}
 
-	q11 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
-	v11 := model.Vector{}
+	q16 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_workload_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v16 := model.Vector{}
+
+	q17 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="istio-system"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
+	v17 := model.Vector{}
 
 	client, xapi, _, err := setupMockedWithIstioComponentNamespaces()
 	if err != nil {
@@ -2379,6 +2426,12 @@ func TestComplexGraph(t *testing.T) {
 	mockQuery(xapi, q9, &v9)
 	mockQuery(xapi, q10, &v10)
 	mockQuery(xapi, q11, &v11)
+	mockQuery(xapi, q12, &v12)
+	mockQuery(xapi, q13, &v13)
+	mockQuery(xapi, q14, &v14)
+	mockQuery(xapi, q15, &v15)
+	mockQuery(xapi, q16, &v16)
+	mockQuery(xapi, q17, &v17)
 
 	var fut func(b *business.Layer, p *prometheus.Client, o graph.Options) (int, interface{})
 
@@ -2414,8 +2467,11 @@ func TestComplexGraph(t *testing.T) {
 
 func TestMultiClusterSourceGraph(t *testing.T) {
 	// bookinfo
-	q0 := `round(sum(rate(istio_requests_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
-	q0m0 := model.Metric{
+	q0 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace!="bookinfo",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.bookinfo\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
+	v0 := model.Vector{}
+
+	q1 := `round(sum(rate(istio_requests_total{reporter="destination",destination_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
+	q1m0 := model.Metric{
 		"destination_canonical_revision": "v2",
 		"destination_canonical_service":  "reviews",
 		"destination_cluster":            "kukulcan",
@@ -2432,7 +2488,7 @@ func TestMultiClusterSourceGraph(t *testing.T) {
 		"source_cluster":                 "kukulcan",
 		"source_workload":                "productpage-v1",
 		"source_workload_namespace":      "bookinfo"}
-	q0m1 := model.Metric{
+	q1m1 := model.Metric{
 		"destination_canonical_revision": "v1",
 		"destination_canonical_service":  "details",
 		"destination_cluster":            "kukulcan",
@@ -2449,7 +2505,7 @@ func TestMultiClusterSourceGraph(t *testing.T) {
 		"source_cluster":                 "kukulcan",
 		"source_workload":                "productpage-v1",
 		"source_workload_namespace":      "bookinfo"}
-	q0m2 := model.Metric{
+	q1m2 := model.Metric{
 		"destination_canonical_revision": "v1",
 		"destination_canonical_service":  "productpage",
 		"destination_cluster":            "kukulcan",
@@ -2466,90 +2522,6 @@ func TestMultiClusterSourceGraph(t *testing.T) {
 		"source_cluster":                 "kukulcan",
 		"source_workload":                "istio-ingressgateway",
 		"source_workload_namespace":      "istio-system"}
-	q0m3 := model.Metric{
-		"destination_canonical_revision": "v1",
-		"destination_canonical_service":  "reviews",
-		"destination_cluster":            "kukulcan",
-		"destination_service":            "reviews.bookinfo.svc.cluster.local",
-		"destination_service_name":       "reviews",
-		"destination_service_namespace":  "bookinfo",
-		"destination_workload":           "reviews-v1",
-		"destination_workload_namespace": "bookinfo",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-",
-		"source_canonical_revision":      "v1",
-		"source_canonical_service":       "productpage",
-		"source_cluster":                 "kukulcan",
-		"source_workload":                "productpage-v1",
-		"source_workload_namespace":      "bookinfo"}
-	v0 := model.Vector{
-		&model.Sample{
-			Metric: q0m0,
-			Value:  100},
-		&model.Sample{
-			Metric: q0m1,
-			Value:  100},
-		&model.Sample{
-			Metric: q0m2,
-			Value:  100},
-		&model.Sample{
-			Metric: q0m3,
-			Value:  100},
-	}
-
-	q1 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
-	q1m0 := model.Metric{
-		"destination_canonical_revision": "v3",
-		"destination_canonical_service":  "reviews",
-		"destination_cluster":            "tzotz",
-		"destination_service":            "reviews.bookinfo.svc.cluster.local",
-		"destination_service_name":       "reviews",
-		"destination_service_namespace":  "bookinfo",
-		"destination_workload":           "reviews-v3",
-		"destination_workload_namespace": "bookinfo",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-",
-		"source_canonical_revision":      "v1",
-		"source_canonical_service":       "productpage",
-		"source_cluster":                 "kukulcan",
-		"source_workload":                "productpage-v1",
-		"source_workload_namespace":      "bookinfo"}
-	q1m1 := model.Metric{
-		"destination_canonical_revision": "v1",
-		"destination_canonical_service":  "ratings",
-		"destination_cluster":            "tzotz",
-		"destination_service":            "ratings.bookinfo.svc.cluster.local",
-		"destination_service_name":       "ratings",
-		"destination_service_namespace":  "bookinfo",
-		"destination_workload":           "ratings-v1",
-		"destination_workload_namespace": "bookinfo",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-",
-		"source_canonical_revision":      "v2",
-		"source_canonical_service":       "reviews",
-		"source_cluster":                 "kukulcan",
-		"source_workload":                "reviews-v2",
-		"source_workload_namespace":      "bookinfo"}
-	q1m2 := model.Metric{
-		"destination_canonical_revision": "v1",
-		"destination_canonical_service":  "details",
-		"destination_cluster":            "kukulcan",
-		"destination_service":            "details.bookinfo.svc.cluster.local",
-		"destination_service_name":       "details",
-		"destination_service_namespace":  "bookinfo",
-		"destination_workload":           "details-v1",
-		"destination_workload_namespace": "bookinfo",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-",
-		"source_canonical_revision":      "v1",
-		"source_canonical_service":       "productpage",
-		"source_cluster":                 "kukulcan",
-		"source_workload":                "productpage-v1",
-		"source_workload_namespace":      "bookinfo"}
 	q1m3 := model.Metric{
 		"destination_canonical_revision": "v1",
 		"destination_canonical_service":  "reviews",
@@ -2558,40 +2530,6 @@ func TestMultiClusterSourceGraph(t *testing.T) {
 		"destination_service_name":       "reviews",
 		"destination_service_namespace":  "bookinfo",
 		"destination_workload":           "reviews-v1",
-		"destination_workload_namespace": "bookinfo",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-",
-		"source_canonical_revision":      "v1",
-		"source_canonical_service":       "productpage",
-		"source_cluster":                 "kukulcan",
-		"source_workload":                "productpage-v1",
-		"source_workload_namespace":      "bookinfo"}
-	q1m4 := model.Metric{
-		"destination_canonical_revision": "v2",
-		"destination_canonical_service":  "reviews",
-		"destination_cluster":            "kukulcan",
-		"destination_service":            "reviews.bookinfo.svc.cluster.local",
-		"destination_service_name":       "reviews",
-		"destination_service_namespace":  "bookinfo",
-		"destination_workload":           "reviews-v2",
-		"destination_workload_namespace": "bookinfo",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-",
-		"source_canonical_revision":      "v1",
-		"source_canonical_service":       "productpage",
-		"source_cluster":                 "kukulcan",
-		"source_workload":                "productpage-v1",
-		"source_workload_namespace":      "bookinfo"}
-	q1m5 := model.Metric{
-		"destination_canonical_revision": "v2",
-		"destination_canonical_service":  "reviews",
-		"destination_cluster":            "tzotz",
-		"destination_service":            "reviews.bookinfo.svc.cluster.local",
-		"destination_service_name":       "reviews",
-		"destination_service_namespace":  "bookinfo",
-		"destination_workload":           "reviews-v2",
 		"destination_workload_namespace": "bookinfo",
 		"request_protocol":               "http",
 		"response_code":                  "200",
@@ -2614,19 +2552,140 @@ func TestMultiClusterSourceGraph(t *testing.T) {
 		&model.Sample{
 			Metric: q1m3,
 			Value:  100},
+	}
+
+	q2 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) ,0.001)`
+	q2m0 := model.Metric{
+		"destination_canonical_revision": "v3",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "tzotz",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v3",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q2m1 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "ratings",
+		"destination_cluster":            "tzotz",
+		"destination_service":            "ratings.bookinfo.svc.cluster.local",
+		"destination_service_name":       "ratings",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "ratings-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v2",
+		"source_canonical_service":       "reviews",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "reviews-v2",
+		"source_workload_namespace":      "bookinfo"}
+	q2m2 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "details",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "details.bookinfo.svc.cluster.local",
+		"destination_service_name":       "details",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "details-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q2m3 := model.Metric{
+		"destination_canonical_revision": "v1",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v1",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q2m4 := model.Metric{
+		"destination_canonical_revision": "v2",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "kukulcan",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	q2m5 := model.Metric{
+		"destination_canonical_revision": "v2",
+		"destination_canonical_service":  "reviews",
+		"destination_cluster":            "tzotz",
+		"destination_service":            "reviews.bookinfo.svc.cluster.local",
+		"destination_service_name":       "reviews",
+		"destination_service_namespace":  "bookinfo",
+		"destination_workload":           "reviews-v2",
+		"destination_workload_namespace": "bookinfo",
+		"request_protocol":               "http",
+		"response_code":                  "200",
+		"response_flags":                 "-",
+		"source_canonical_revision":      "v1",
+		"source_canonical_service":       "productpage",
+		"source_cluster":                 "kukulcan",
+		"source_workload":                "productpage-v1",
+		"source_workload_namespace":      "bookinfo"}
+	v2 := model.Vector{
 		&model.Sample{
-			Metric: q1m4,
+			Metric: q2m0,
 			Value:  100},
 		&model.Sample{
-			Metric: q1m5,
+			Metric: q2m1,
+			Value:  100},
+		&model.Sample{
+			Metric: q2m2,
+			Value:  100},
+		&model.Sample{
+			Metric: q2m3,
+			Value:  100},
+		&model.Sample{
+			Metric: q2m4,
+			Value:  100},
+		&model.Sample{
+			Metric: q2m5,
 			Value:  100},
 	}
 
-	q2 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_service_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
-	v2 := model.Vector{}
-
-	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
+	q3 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace!="bookinfo",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.bookinfo\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
 	v3 := model.Vector{}
+
+	q4 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="destination",destination_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
+	v4 := model.Vector{}
+
+	q5 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) ,0.001)`
+	v5 := model.Vector{}
 
 	client, xapi, _, err := setupMockedWithIstioComponentNamespaces()
 	if err != nil {
@@ -2637,6 +2696,8 @@ func TestMultiClusterSourceGraph(t *testing.T) {
 	mockQuery(xapi, q1, &v1)
 	mockQuery(xapi, q2, &v2)
 	mockQuery(xapi, q3, &v3)
+	mockQuery(xapi, q4, &v4)
+	mockQuery(xapi, q5, &v5)
 
 	var fut func(b *business.Layer, p *prometheus.Client, o graph.Options) (int, interface{})
 

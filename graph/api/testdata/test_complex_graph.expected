@@ -110,6 +110,28 @@
       },
       {
         "data": {
+          "id": "c86e8ec8a41fcdafe296a22f7d55491b",
+          "nodeType": "app",
+          "cluster": "cluster-tutorial",
+          "namespace": "outsider",
+          "workload": "outsider-ingress",
+          "app": "outsider-ingress",
+          "version": "latest",
+          "traffic": [
+            {
+              "protocol": "http",
+              "rates": {
+                "httpOut": "50.00"
+              }
+            }
+          ],
+          "isInaccessible": true,
+          "isOutside": true,
+          "isRoot": true
+        }
+      },
+      {
+        "data": {
           "id": "11de61605e36ab80a0b85d03f8d48a48",
           "nodeType": "app",
           "cluster": "cluster-tutorial",
@@ -160,6 +182,32 @@
               "protocol": "http",
               "rates": {
                 "httpIn": "400.00"
+              }
+            }
+          ],
+          "isInaccessible": true
+        }
+      },
+      {
+        "data": {
+          "id": "c800c2f5f6e1100ae3ebd8b63c91a0ed",
+          "nodeType": "service",
+          "cluster": "unknown",
+          "namespace": "unknown",
+          "service": "reviews",
+          "destServices": [
+            {
+              "cluster": "unknown",
+              "namespace": "unknown",
+              "name": "reviews"
+            }
+          ],
+          "traffic": [
+            {
+              "protocol": "http",
+              "rates": {
+                "httpIn": "50.00",
+                "httpIn5xx": "50.00"
               }
             }
           ],
@@ -345,6 +393,32 @@
                 },
                 "hosts": {
                   "productpage:9080": "100.0"
+                }
+              }
+            }
+          }
+        }
+      },
+      {
+        "data": {
+          "id": "37cfe4a58ce96755179559c08fdda7d9",
+          "source": "c86e8ec8a41fcdafe296a22f7d55491b",
+          "target": "c800c2f5f6e1100ae3ebd8b63c91a0ed",
+          "traffic": {
+            "protocol": "http",
+            "rates": {
+              "http": "50.00",
+              "http5xx": "50.00",
+              "httpPercentErr": "100.0",
+              "httpPercentReq": "100.0"
+            },
+            "responses": {
+              "503": {
+                "flags": {
+                  "-": "100.0"
+                },
+                "hosts": {
+                  "reviews.bookinfo.svc.cluster.local": "100.0"
                 }
               }
             }

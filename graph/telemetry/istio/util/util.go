@@ -41,7 +41,7 @@ func HandleDestination(sourceCluster, sourceWlNs, sourceWl, destCluster, destSvc
 
 	if destSvc == egressHost && destSvc == destSvcName {
 		istioNs := config.Get().IstioNamespace
-		log.Infof("Massage: destCluster=%s, destSvcNs=%s", sourceCluster, istioNs)
+		log.Debugf("HandleDestination: destCluster=%s, destSvcNs=%s", sourceCluster, istioNs)
 		return sourceCluster, istioNs, "istio-egressgateway", istioNs, "istio-egressgateway", "istio-egressgateway", "latest", true
 	}
 
