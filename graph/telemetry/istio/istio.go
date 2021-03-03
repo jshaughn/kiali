@@ -222,7 +222,10 @@ func populateTrafficMap(trafficMap graph.TrafficMap, vector *model.Vector, isTCP
 			_, destNodeType := graph.Id(destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o.GraphType)
 			inject = (graph.NodeTypeService != destNodeType)
 		}
-		inNamespace := sourceCluster == destCluster && sourceWlNs == destSvcNs
+		// TODO: restore the check when https://github.com/istio/istio/issues/29373 is fixed for all
+		// supported versions.  Until then we need to relax the cluster comparison.
+		// inNamespace := sourceWlNs == destSvcNs && sourceCluster == destCluster
+		inNamespace := sourceWlNs == destSvcNs && (sourceCluster == destCluster || !graph.IsOK(destCluster))
 		if inject {
 			addTraffic(trafficMap, direction, inNamespace, val, protocol, code, flags, host, sourceCluster, sourceWlNs, "", sourceWl, sourceApp, sourceVer, destCluster, destSvcNs, destSvcName, "", "", "", "", o)
 			addTraffic(trafficMap, direction, inNamespace, val, protocol, code, flags, host, destCluster, destSvcNs, destSvcName, "", "", "", destCluster, destSvcNs, destSvcName, destWlNs, destWl, destApp, destVer, o)

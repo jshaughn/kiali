@@ -103,9 +103,13 @@ func IsBadDestTelemetry(cluster string, clusterOK bool, svcNs, svc, svcName, wl 
 		return true
 	}
 	// case2
-	if graph.IsOK(svcNs) && clusterOK && !graph.IsOK(cluster) {
-		log.Debugf("Skipping bad dest telemetry [case 2] [%s] [%s]", svcNs, cluster)
-		return true
-	}
+	// TODO: restore the check when https://github.com/istio/istio/issues/29373 is fixed for all
+	// supported versions.  Until then we need to allow the incorrect "unknown" destCluster
+	/*
+		  if graph.IsOK(svcNs) && clusterOK && !graph.IsOK(cluster) {
+			log.Debugf("Skipping bad dest telemetry [case 2] [%s] [%s]", svcNs, cluster)
+			return true
+		}
+	*/
 	return false
 }

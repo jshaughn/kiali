@@ -2096,23 +2096,27 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
-	q1m5 := model.Metric{ // bad dest telem (variant 2.1)
-		"source_cluster":                 "cluster-tutorial",
-		"source_workload_namespace":      "tutorial",
-		"source_workload":                "customer-v1",
-		"source_canonical_service":       "customer",
-		"source_canonical_revision":      "v1",
-		"destination_cluster":            "unknown",
-		"destination_service_namespace":  "bookinfo",
-		"destination_service":            "reviews",
-		"destination_service_name":       "reviews",
-		"destination_workload_namespace": "bookinfo",
-		"destination_workload":           "reviews-v1",
-		"destination_canonical_service":  "reviews",
-		"destination_canonical_revision": "v1",
-		"request_protocol":               "http",
-		"response_code":                  "200",
-		"response_flags":                 "-"}
+	// TODO: restore the check when https://github.com/istio/istio/issues/29373 is fixed for all
+	// supported versions.  Until then we need to allow the incorrect "unknown" destCluster
+	/*
+		q1m5 := model.Metric{ // bad dest telem (variant 2.1)
+			"source_cluster":                 "cluster-tutorial",
+			"source_workload_namespace":      "tutorial",
+			"source_workload":                "customer-v1",
+			"source_canonical_service":       "customer",
+			"source_canonical_revision":      "v1",
+			"destination_cluster":            "unknown",
+			"destination_service_namespace":  "bookinfo",
+			"destination_service":            "reviews",
+			"destination_service_name":       "reviews",
+			"destination_workload_namespace": "bookinfo",
+			"destination_workload":           "reviews-v1",
+			"destination_canonical_service":  "reviews",
+			"destination_canonical_revision": "v1",
+			"request_protocol":               "http",
+			"response_code":                  "200",
+			"response_flags":                 "-"}
+	*/
 	v1 := model.Vector{
 		&model.Sample{
 			Metric: q1m0,
@@ -2129,9 +2133,12 @@ func TestComplexGraph(t *testing.T) {
 		&model.Sample{
 			Metric: q1m4,
 			Value:  300},
-		&model.Sample{
-			Metric: q1m5,
-			Value:  700},
+		// see above
+		/*
+			&model.Sample{
+				Metric: q1m5,
+				Value:  700},
+		*/
 	}
 
 	q2 := `round(sum(rate(istio_requests_total{reporter="source",source_workload_namespace="bookinfo"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,request_protocol,response_code,grpc_response_status,response_flags) > 0,0.001)`
@@ -2317,7 +2324,10 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "grpc",
 		"response_code":                  "0", // note, grpc_response_status is not reported for grpc with no response
 		"response_flags":                 "DC"}
-	q8m7 := model.Metric{ // bad dest telem (variant 2.1)
+	// TODO: restore the check when https://github.com/istio/istio/issues/29373 is fixed for all
+	// supported versions.  Until then we need to allow the incorrect "unknown" destCluster
+	/*
+		q8m7 := model.Metric{ // bad dest telem (variant 2.1)
 		"source_cluster":                 "cluster-tutorial",
 		"source_workload_namespace":      "tutorial",
 		"source_workload":                "customer-v1",
@@ -2334,6 +2344,7 @@ func TestComplexGraph(t *testing.T) {
 		"request_protocol":               "http",
 		"response_code":                  "200",
 		"response_flags":                 "-"}
+	*/
 	v8 := model.Vector{
 		&model.Sample{
 			Metric: q8m0,
@@ -2356,9 +2367,12 @@ func TestComplexGraph(t *testing.T) {
 		&model.Sample{
 			Metric: q8m6,
 			Value:  600},
-		&model.Sample{
-			Metric: q8m7,
-			Value:  700},
+		// see above
+		/*
+			&model.Sample{
+				Metric: q8m7,
+				Value:  700},
+		*/
 	}
 
 	q9 := `round(sum(rate(istio_tcp_sent_bytes_total{reporter="source",source_workload_namespace!="tutorial",destination_workload_namespace="unknown",destination_workload="unknown",destination_service=~"^.+\\.tutorial\\..+$"} [600s])) by (source_cluster,source_workload_namespace,source_workload,source_canonical_service,source_canonical_revision,destination_cluster,destination_service_namespace,destination_service,destination_service_name,destination_workload_namespace,destination_workload,destination_canonical_service,destination_canonical_revision,response_flags) > 0,0.001)`
