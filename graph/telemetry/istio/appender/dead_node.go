@@ -30,7 +30,7 @@ func (a DeadNodeAppender) AppendGraph(trafficMap graph.TrafficMap, globalInfo *g
 
 	if globalInfo.HomeCluster == "" {
 		globalInfo.HomeCluster = "unknown"
-		if c, err := globalInfo.Business.Mesh.ResolveKialiControlPlaneCluster(); c != nil && err == nil {
+		if c, err := globalInfo.Business.Mesh.ResolveKialiControlPlaneCluster(nil); c != nil && err == nil {
 			globalInfo.HomeCluster = c.Name
 		}
 	}
