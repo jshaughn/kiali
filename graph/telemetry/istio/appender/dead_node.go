@@ -35,12 +35,6 @@ func (a DeadNodeAppender) AppendGraph(trafficMap graph.TrafficMap, globalInfo *g
 		}
 	}
 
-	if getWorkloadList(namespaceInfo) == nil {
-		workloadList, err := globalInfo.Business.Workload.GetWorkloadList(namespaceInfo.Namespace)
-		graph.CheckError(err)
-		namespaceInfo.Vendor[workloadListKey] = &workloadList
-	}
-
 	// Apply dead node removal iteratively until no dead nodes are found.  Removal of dead nodes may
 	// alter the graph such that new nodes qualify for dead-ness by being orphaned, lack required
 	// outgoing edges, etc.. so we repeat as needed.
@@ -115,7 +109,7 @@ func (a DeadNodeAppender) applyDeadNodes(trafficMap graph.TrafficMap, globalInfo
 			}
 
 			// Remove if backing workload is not defined (always true for "unknown"), flag if there are no pods
-			if workload, found := getWorkload(n.Workload, namespaceInfo); !found {
+			if workload, found := getWorkload(namespaceInfo.Namespace, n.Workload, globalInfo); !found {
 				delete(trafficMap, id)
 				numRemoved++
 			} else {
