@@ -8,27 +8,66 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
   >
     graph_filter_interval_duration
   </Text>
-  <Component
+  <Select
+    aria-describedby=""
+    aria-invalid={false}
     aria-label="graph_filter_interval_duration"
-    ariaLabelledBy="graph_filter_interval_duration"
+    aria-labelledby="graph_filter_interval_duration"
+    chipGroupComponent={null}
     className="fhxf3qu"
-    data-test="graph_filter_interval_duration"
+    clearSelectionsAriaLabel="Clear all"
+    createText="Create"
+    customBadgeText={null}
+    customContent={null}
+    direction="down"
+    favorites={Array []}
+    favoritesLabel="Favorites"
+    hasInlineFilter={false}
+    hasPlaceholderStyle={false}
     id="graph_filter_interval_duration"
+    inlineFilterPlaceholderText={null}
+    inputAutoComplete="off"
+    inputIdPrefix=""
+    isCreatable={false}
+    isCreateSelectOptionObject={false}
     isDisabled={false}
-    isExpanded={false}
+    isGrouped={false}
+    isInputFilterPersisted={false}
+    isInputValuePersisted={false}
+    isOpen={false}
+    isPlain={false}
+    menuAppendTo="inline"
+    noResultsFoundText="No results found"
+    onClear={[Function]}
+    onCreateOption={[Function]}
+    onFilter={null}
     onSelect={[Function]}
     onToggle={[Function]}
+    onTypeaheadInputChanged={null}
+    ouiaSafe={true}
     placeholderText="1m"
+    position="left"
+    removeSelectionAriaLabel="Remove"
     selections={60}
-    toggleId="graph_filter_interval_duration-toggle"
+    toggleAriaLabel="Options menu"
+    toggleIcon={null}
+    toggleId={null}
+    typeAheadAriaLabel=""
+    validated="default"
+    variant="single"
+    width=""
   >
     <SelectOption
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={true}
@@ -36,6 +75,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="60"
     >
       1m
@@ -44,9 +84,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -54,6 +98,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="300"
     >
       5m
@@ -62,9 +107,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -72,6 +121,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="600"
     >
       10m
@@ -80,9 +130,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -90,6 +144,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="1800"
     >
       30m
@@ -98,9 +153,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -108,6 +167,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="3600"
     >
       1h
@@ -116,9 +176,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -126,6 +190,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="10800"
     >
       3h
@@ -134,9 +199,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -144,11 +213,12 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="21600"
     >
       6h
     </SelectOption>
-  </Component>
+  </Select>
 </Fragment>
 `;
 
@@ -160,27 +230,66 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
   >
     metrics_filter_poll_interval
   </Text>
-  <Component
+  <Select
+    aria-describedby=""
+    aria-invalid={false}
     aria-label="metrics_filter_poll_interval"
-    ariaLabelledBy="metrics_filter_poll_interval"
+    aria-labelledby="metrics_filter_poll_interval"
+    chipGroupComponent={null}
     className="fhxf3qu"
-    data-test="metrics_filter_poll_interval"
+    clearSelectionsAriaLabel="Clear all"
+    createText="Create"
+    customBadgeText={null}
+    customContent={null}
+    direction="down"
+    favorites={Array []}
+    favoritesLabel="Favorites"
+    hasInlineFilter={false}
+    hasPlaceholderStyle={false}
     id="metrics_filter_poll_interval"
+    inlineFilterPlaceholderText={null}
+    inputAutoComplete="off"
+    inputIdPrefix=""
+    isCreatable={false}
+    isCreateSelectOptionObject={false}
     isDisabled={false}
-    isExpanded={false}
+    isGrouped={false}
+    isInputFilterPersisted={false}
+    isInputValuePersisted={false}
+    isOpen={false}
+    isPlain={false}
+    menuAppendTo="inline"
+    noResultsFoundText="No results found"
+    onClear={[Function]}
+    onCreateOption={[Function]}
+    onFilter={null}
     onSelect={[Function]}
     onToggle={[Function]}
+    onTypeaheadInputChanged={null}
+    ouiaSafe={true}
     placeholderText="Every 15s"
+    position="left"
+    removeSelectionAriaLabel="Remove"
     selections={15000}
-    toggleId="metrics_filter_poll_interval-toggle"
+    toggleAriaLabel="Options menu"
+    toggleIcon={null}
+    toggleId={null}
+    typeAheadAriaLabel=""
+    validated="default"
+    variant="single"
+    width=""
   >
     <SelectOption
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -188,6 +297,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="0"
     >
       Pause
@@ -196,9 +306,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -206,6 +320,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="10000"
     >
       Every 10s
@@ -214,9 +329,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={true}
@@ -224,6 +343,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="15000"
     >
       Every 15s
@@ -232,9 +352,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -242,6 +366,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="30000"
     >
       Every 30s
@@ -250,9 +375,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -260,6 +389,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="60000"
     >
       Every 1m
@@ -268,9 +398,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -278,6 +412,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="300000"
     >
       Every 5m
@@ -286,9 +421,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -296,11 +435,12 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="900000"
     >
       Every 15m
     </SelectOption>
-  </Component>
+  </Select>
 </Fragment>
 `;
 
@@ -312,26 +452,66 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
   >
     graph_filter_layouts
   </Text>
-  <Component
+  <Select
+    aria-describedby=""
+    aria-invalid={false}
     aria-label="graph_filter_layouts"
-    ariaLabelledBy="graph_filter_layouts"
+    aria-labelledby="graph_filter_layouts"
+    chipGroupComponent={null}
     className="fhxf3qu"
-    data-test="graph_filter_layouts"
+    clearSelectionsAriaLabel="Clear all"
+    createText="Create"
+    customBadgeText={null}
+    customContent={null}
+    direction="down"
+    favorites={Array []}
+    favoritesLabel="Favorites"
+    hasInlineFilter={false}
+    hasPlaceholderStyle={false}
     id="graph_filter_layouts"
+    inlineFilterPlaceholderText={null}
+    inputAutoComplete="off"
+    inputIdPrefix=""
+    isCreatable={false}
+    isCreateSelectOptionObject={false}
     isDisabled={false}
-    isExpanded={false}
+    isGrouped={false}
+    isInputFilterPersisted={false}
+    isInputValuePersisted={false}
+    isOpen={false}
+    isPlain={false}
+    menuAppendTo="inline"
+    noResultsFoundText="No results found"
+    onClear={[Function]}
+    onCreateOption={[Function]}
+    onFilter={null}
     onSelect={[Function]}
     onToggle={[Function]}
+    onTypeaheadInputChanged={null}
+    ouiaSafe={true}
+    placeholderText=""
+    position="left"
+    removeSelectionAriaLabel="Remove"
     selections="cola"
-    toggleId="graph_filter_layouts-toggle"
+    toggleAriaLabel="Options menu"
+    toggleIcon={null}
+    toggleId={null}
+    typeAheadAriaLabel=""
+    validated="default"
+    variant="single"
+    width=""
   >
     <SelectOption
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -339,6 +519,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="kiali-grid"
     >
       Grid
@@ -347,9 +528,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -357,6 +542,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="kiali-concentric"
     >
       Concentric
@@ -365,9 +551,13 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -375,11 +565,12 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="kiali-dagre"
     >
       Dagre
     </SelectOption>
-  </Component>
+  </Select>
 </Fragment>
 `;
 
@@ -391,27 +582,66 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
   >
     graph_filter_interval_duration
   </Text>
-  <Component
+  <Select
+    aria-describedby=""
+    aria-invalid={false}
     aria-label="graph_filter_interval_duration"
-    ariaLabelledBy="graph_filter_interval_duration"
+    aria-labelledby="graph_filter_interval_duration"
+    chipGroupComponent={null}
     className="fhxf3qu"
-    data-test="graph_filter_interval_duration"
+    clearSelectionsAriaLabel="Clear all"
+    createText="Create"
+    customBadgeText={null}
+    customContent={null}
+    direction="down"
+    favorites={Array []}
+    favoritesLabel="Favorites"
+    hasInlineFilter={false}
+    hasPlaceholderStyle={false}
     id="graph_filter_interval_duration"
+    inlineFilterPlaceholderText={null}
+    inputAutoComplete="off"
+    inputIdPrefix=""
+    isCreatable={false}
+    isCreateSelectOptionObject={false}
     isDisabled={false}
-    isExpanded={false}
+    isGrouped={false}
+    isInputFilterPersisted={false}
+    isInputValuePersisted={false}
+    isOpen={false}
+    isPlain={false}
+    menuAppendTo="inline"
+    noResultsFoundText="No results found"
+    onClear={[Function]}
+    onCreateOption={[Function]}
+    onFilter={null}
     onSelect={[Function]}
     onToggle={[Function]}
+    onTypeaheadInputChanged={null}
+    ouiaSafe={true}
     placeholderText="1m"
+    position="left"
+    removeSelectionAriaLabel="Remove"
     selections={60}
-    toggleId="graph_filter_interval_duration-toggle"
+    toggleAriaLabel="Options menu"
+    toggleIcon={null}
+    toggleId={null}
+    typeAheadAriaLabel=""
+    validated="default"
+    variant="single"
+    width=""
   >
     <SelectOption
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={true}
@@ -419,6 +649,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="60"
     >
       1m
@@ -427,9 +658,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -437,6 +672,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="300"
     >
       5m
@@ -445,9 +681,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -455,6 +695,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="600"
     >
       10m
@@ -463,9 +704,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -473,6 +718,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="1800"
     >
       30m
@@ -481,9 +727,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -491,6 +741,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="3600"
     >
       1h
@@ -499,9 +750,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -509,6 +764,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="10800"
     >
       3h
@@ -517,9 +773,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -527,11 +787,12 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="21600"
     >
       6h
     </SelectOption>
-  </Component>
+  </Select>
 </Fragment>
 `;
 
@@ -543,27 +804,66 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
   >
     metrics_filter_poll_interval
   </Text>
-  <Component
+  <Select
+    aria-describedby=""
+    aria-invalid={false}
     aria-label="metrics_filter_poll_interval"
-    ariaLabelledBy="metrics_filter_poll_interval"
+    aria-labelledby="metrics_filter_poll_interval"
+    chipGroupComponent={null}
     className="fhxf3qu"
-    data-test="metrics_filter_poll_interval"
+    clearSelectionsAriaLabel="Clear all"
+    createText="Create"
+    customBadgeText={null}
+    customContent={null}
+    direction="down"
+    favorites={Array []}
+    favoritesLabel="Favorites"
+    hasInlineFilter={false}
+    hasPlaceholderStyle={false}
     id="metrics_filter_poll_interval"
+    inlineFilterPlaceholderText={null}
+    inputAutoComplete="off"
+    inputIdPrefix=""
+    isCreatable={false}
+    isCreateSelectOptionObject={false}
     isDisabled={false}
-    isExpanded={false}
+    isGrouped={false}
+    isInputFilterPersisted={false}
+    isInputValuePersisted={false}
+    isOpen={false}
+    isPlain={false}
+    menuAppendTo="inline"
+    noResultsFoundText="No results found"
+    onClear={[Function]}
+    onCreateOption={[Function]}
+    onFilter={null}
     onSelect={[Function]}
     onToggle={[Function]}
+    onTypeaheadInputChanged={null}
+    ouiaSafe={true}
     placeholderText="Every 15s"
+    position="left"
+    removeSelectionAriaLabel="Remove"
     selections={15000}
-    toggleId="metrics_filter_poll_interval-toggle"
+    toggleAriaLabel="Options menu"
+    toggleIcon={null}
+    toggleId={null}
+    typeAheadAriaLabel=""
+    validated="default"
+    variant="single"
+    width=""
   >
     <SelectOption
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -571,6 +871,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="0"
     >
       Pause
@@ -579,9 +880,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -589,6 +894,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="10000"
     >
       Every 10s
@@ -597,9 +903,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={true}
@@ -607,6 +917,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="15000"
     >
       Every 15s
@@ -615,9 +926,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -625,6 +940,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="30000"
     >
       Every 30s
@@ -633,9 +949,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -643,6 +963,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="60000"
     >
       Every 1m
@@ -651,9 +972,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -661,6 +986,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="300000"
     >
       Every 5m
@@ -669,9 +995,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -679,11 +1009,12 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="900000"
     >
       Every 15m
     </SelectOption>
-  </Component>
+  </Select>
 </Fragment>
 `;
 
@@ -695,26 +1026,66 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
   >
     graph_filter_layouts
   </Text>
-  <Component
+  <Select
+    aria-describedby=""
+    aria-invalid={false}
     aria-label="graph_filter_layouts"
-    ariaLabelledBy="graph_filter_layouts"
+    aria-labelledby="graph_filter_layouts"
+    chipGroupComponent={null}
     className="fhxf3qu"
-    data-test="graph_filter_layouts"
+    clearSelectionsAriaLabel="Clear all"
+    createText="Create"
+    customBadgeText={null}
+    customContent={null}
+    direction="down"
+    favorites={Array []}
+    favoritesLabel="Favorites"
+    hasInlineFilter={false}
+    hasPlaceholderStyle={false}
     id="graph_filter_layouts"
+    inlineFilterPlaceholderText={null}
+    inputAutoComplete="off"
+    inputIdPrefix=""
+    isCreatable={false}
+    isCreateSelectOptionObject={false}
     isDisabled={false}
-    isExpanded={false}
+    isGrouped={false}
+    isInputFilterPersisted={false}
+    isInputValuePersisted={false}
+    isOpen={false}
+    isPlain={false}
+    menuAppendTo="inline"
+    noResultsFoundText="No results found"
+    onClear={[Function]}
+    onCreateOption={[Function]}
+    onFilter={null}
     onSelect={[Function]}
     onToggle={[Function]}
+    onTypeaheadInputChanged={null}
+    ouiaSafe={true}
+    placeholderText=""
+    position="left"
+    removeSelectionAriaLabel="Remove"
     selections="cola"
-    toggleId="graph_filter_layouts-toggle"
+    toggleAriaLabel="Options menu"
+    toggleIcon={null}
+    toggleId={null}
+    typeAheadAriaLabel=""
+    validated="default"
+    variant="single"
+    width=""
   >
     <SelectOption
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -722,6 +1093,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="kiali-grid"
     >
       Grid
@@ -730,9 +1102,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -740,6 +1116,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="kiali-concentric"
     >
       Concentric
@@ -748,9 +1125,13 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       className=""
       component="button"
       index={0}
+      inputId=""
       isChecked={false}
       isDisabled={false}
-      isFocused={false}
+      isFavorite={null}
+      isLastOptionBeforeFooter={[Function]}
+      isLoad={false}
+      isLoading={false}
       isNoResultsOption={false}
       isPlaceholder={false}
       isSelected={false}
@@ -758,10 +1139,11 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
       keyHandler={[Function]}
       onClick={[Function]}
       sendRef={[Function]}
+      setViewMoreNextIndex={[Function]}
       value="kiali-dagre"
     >
       Dagre
     </SelectOption>
-  </Component>
+  </Select>
 </Fragment>
 `;
