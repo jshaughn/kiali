@@ -156,18 +156,6 @@
     "last 2 versions",
     "not ie <= 11"
   ],
-  "eslintConfig": {
-    "overrides": [
-      {
-        "files": [
-          "**/*.stories.*"
-        ],
-        "rules": {
-          "import/no-anonymous-default-export": "off"
-        }
-      }
-    ]
-  },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true
   }
