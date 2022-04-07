@@ -14,7 +14,6 @@ updates:
 
   - package-ecosystem: "npm"
     directory: "/frontend"
-    target-branch: "jshaughn:kiali#4836"
     schedule:
       interval: "daily"
     # Disable version updates for npm dependencies
