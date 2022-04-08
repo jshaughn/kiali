@@ -81,6 +81,7 @@ export class ToolbarDropdown extends React.Component<ToolbarDropdownProps, Toolb
         {Object.keys(this.props.options).map(key => {
           return (
             <SelectOption
+              id={key}
               key={key}
               isDisabled={this.props.disabled}
               isSelected={key === String(this.props.value || this.state.currentValue)}

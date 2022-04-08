@@ -60,6 +60,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="60"
       index={0}
       inputId=""
       isChecked={false}
@@ -83,6 +84,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="300"
       index={0}
       inputId=""
       isChecked={false}
@@ -106,6 +108,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="600"
       index={0}
       inputId=""
       isChecked={false}
@@ -129,6 +132,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="1800"
       index={0}
       inputId=""
       isChecked={false}
@@ -152,6 +156,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="3600"
       index={0}
       inputId=""
       isChecked={false}
@@ -175,6 +180,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="10800"
       index={0}
       inputId=""
       isChecked={false}
@@ -198,6 +204,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 1`] = `
     <SelectOption
       className=""
       component="button"
+      id="21600"
       index={0}
       inputId=""
       isChecked={false}
@@ -282,6 +289,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="0"
       index={0}
       inputId=""
       isChecked={false}
@@ -305,6 +313,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="10000"
       index={0}
       inputId=""
       isChecked={false}
@@ -328,6 +337,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="15000"
       index={0}
       inputId=""
       isChecked={false}
@@ -351,6 +361,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="30000"
       index={0}
       inputId=""
       isChecked={false}
@@ -374,6 +385,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="60000"
       index={0}
       inputId=""
       isChecked={false}
@@ -397,6 +409,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="300000"
       index={0}
       inputId=""
       isChecked={false}
@@ -420,6 +433,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 2`] = `
     <SelectOption
       className=""
       component="button"
+      id="900000"
       index={0}
       inputId=""
       isChecked={false}
@@ -504,6 +518,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
     <SelectOption
       className=""
       component="button"
+      id="kiali-grid"
       index={0}
       inputId=""
       isChecked={false}
@@ -527,6 +542,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
     <SelectOption
       className=""
       component="button"
+      id="kiali-concentric"
       index={0}
       inputId=""
       isChecked={false}
@@ -550,6 +566,7 @@ exports[`ToolbarDropdown Render correctly all dropdowns 3`] = `
     <SelectOption
       className=""
       component="button"
+      id="kiali-dagre"
       index={0}
       inputId=""
       isChecked={false}
@@ -634,6 +651,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="60"
       index={0}
       inputId=""
       isChecked={false}
@@ -657,6 +675,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="300"
       index={0}
       inputId=""
       isChecked={false}
@@ -680,6 +699,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="600"
       index={0}
       inputId=""
       isChecked={false}
@@ -703,6 +723,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="1800"
       index={0}
       inputId=""
       isChecked={false}
@@ -726,6 +747,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="3600"
       index={0}
       inputId=""
       isChecked={false}
@@ -749,6 +771,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="10800"
       index={0}
       inputId=""
       isChecked={false}
@@ -772,6 +795,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="21600"
       index={0}
       inputId=""
       isChecked={false}
@@ -856,6 +880,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="0"
       index={0}
       inputId=""
       isChecked={false}
@@ -879,6 +904,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="10000"
       index={0}
       inputId=""
       isChecked={false}
@@ -902,6 +928,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="15000"
       index={0}
       inputId=""
       isChecked={false}
@@ -925,6 +952,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="30000"
       index={0}
       inputId=""
       isChecked={false}
@@ -948,6 +976,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="60000"
       index={0}
       inputId=""
       isChecked={false}
@@ -971,6 +1000,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="300000"
       index={0}
       inputId=""
       isChecked={false}
@@ -994,6 +1024,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="900000"
       index={0}
       inputId=""
       isChecked={false}
@@ -1078,6 +1109,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="kiali-grid"
       index={0}
       inputId=""
       isChecked={false}
@@ -1101,6 +1133,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="kiali-concentric"
       index={0}
       inputId=""
       isChecked={false}
@@ -1124,6 +1157,7 @@ exports[`ToolbarDropdown Render dropdowns correctly with controlled values and l
     <SelectOption
       className=""
       component="button"
+      id="kiali-dagre"
       index={0}
       inputId=""
       isChecked={false}
