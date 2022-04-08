@@ -15,7 +15,7 @@ updates:
 
   - package-ecosystem: "npm"
     directory: "/frontend"
-    target-branch: "pfreact"
+    target-branch: "kiali4836"
     schedule:
       interval: "daily"
     # Disable version updates for npm dependencies
