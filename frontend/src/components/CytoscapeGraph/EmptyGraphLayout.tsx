@@ -83,7 +83,7 @@ export default class EmptyGraphLayout extends React.Component<EmptyGraphLayoutPr
   render() {
     if (this.props.isError) {
       return (
-        <EmptyState variant={EmptyStateVariant.large} className={emptyStateStyle}>
+        <EmptyState id="empty-graph-error" variant={EmptyStateVariant.large} className={emptyStateStyle}>
           <EmptyStateIcon icon={KialiIcon.Error} />
           <Title headingLevel="h5" size={TitleSizes.lg}>
             Error loading Graph
@@ -94,7 +94,7 @@ export default class EmptyGraphLayout extends React.Component<EmptyGraphLayoutPr
     }
     if (this.props.isLoading) {
       return (
-        <EmptyState variant={EmptyStateVariant.large} className={emptyStateStyle}>
+        <EmptyState id="empty-graph-is-loading" variant={EmptyStateVariant.large} className={emptyStateStyle}>
           <Title headingLevel="h5" size={TitleSizes.lg}>
             Loading Graph
           </Title>
@@ -104,7 +104,7 @@ export default class EmptyGraphLayout extends React.Component<EmptyGraphLayoutPr
 
     if (this.props.namespaces.length === 0) {
       return (
-        <EmptyState variant={EmptyStateVariant.large} className={emptyStateStyle}>
+        <EmptyState id="empty-graph-no-namespace" variant={EmptyStateVariant.large} className={emptyStateStyle}>
           <Title headingLevel="h5" size={TitleSizes.lg}>
             No namespace is selected
           </Title>
@@ -119,7 +119,7 @@ export default class EmptyGraphLayout extends React.Component<EmptyGraphLayoutPr
 
     if (isGraphEmpty && !this.props.isMiniGraph) {
       return (
-        <EmptyState variant={EmptyStateVariant.large} className={emptyStateStyle}>
+        <EmptyState id="empty-graph" variant={EmptyStateVariant.large} className={emptyStateStyle}>
           <Title headingLevel="h5" size={TitleSizes.lg}>
             Empty Graph
           </Title>
@@ -143,7 +143,7 @@ export default class EmptyGraphLayout extends React.Component<EmptyGraphLayoutPr
 
     if (isGraphEmpty && this.props.isMiniGraph) {
       return (
-        <EmptyState variant={EmptyStateVariant.large} className={emptyStateStyle}>
+        <EmptyState id="empty-mini-graph" variant={EmptyStateVariant.large} className={emptyStateStyle}>
           <Title headingLevel="h5" size={TitleSizes.lg}>
             Empty Graph
           </Title>
