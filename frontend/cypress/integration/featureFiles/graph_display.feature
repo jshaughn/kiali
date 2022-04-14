@@ -16,12 +16,41 @@ Feature: Kiali Graph page - Display menu
 #    Then user sees the "alpha" namespace
 #    And user sees the "beta" namespace
 
-  @graph-page-display
-  Scenario: Graph alpha namespace
-    When user graphs "alpha" namespaces
-    Then user sees the "alpha" namespace
+@graph-page-display
+Scenario: Graph alpha namespace
+  When user graphs "alpha" namespaces
+  Then user sees the "alpha" namespace
 
-  @graph-page-display
-  Scenario: Response-time edge labels
-    When user enables "responseTime" edge labels
+@graph-page-display
+Scenario: User clicks Display Menu
+  When user opens display menu
+  Then the display menu opens
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Average Response-time edge labels
+  When user enables "avg" "responseTime" edge labels
+  Then user sees "responseTime" edge labels
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Median Response-time edge labels
+    When user enables "rt50" "responseTime" edge labels
     Then user sees "responseTime" edge labels
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: 95th Percentile Response-time edge labels
+  When user enables "rt95" "responseTime" edge labels
+  Then user sees "responseTime" edge labels
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: 99th Percentile Response-time edge labels
+  When user enables "rt95" "responseTime" edge labels
+  Then user sees "responseTime" edge labels
+
