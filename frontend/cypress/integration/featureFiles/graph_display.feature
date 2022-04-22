@@ -51,6 +51,11 @@ Scenario: 95th Percentile Response-time edge labels
 # edge label variable must match edge data name
 @graph-page-display
 Scenario: 99th Percentile Response-time edge labels
-  When user enables "rt95" "responseTime" edge labels
+  When user enables "rt99" "responseTime" edge labels
   Then user sees "responseTime" edge labels
 
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Uncheck response time edge labels
+  When user disables "responseTime" edge labels
+  Then user sees "responseTime" edge label option is closed

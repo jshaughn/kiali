@@ -32,6 +32,10 @@ When('user enables {string} {string} edge labels', (percentile, edgeLabel) => {
   cy.get(`input#${percentile}`).check();
 });
 
+When('user disables {string} edge labels', (edgeLabel) => {
+  cy.get('button#display-settings').get(`input#${edgeLabel}`).uncheck();
+});
+
 ///////////////////
 
 Then(`user sees no namespace selected`, () => {
@@ -55,3 +59,10 @@ Then('user sees {string} edge labels', el => {
       assert.isTrue(numEdges > 0);
     });
 });
+
+Then('user sees {string} edge label option is closed', edgeLabel => {
+  const input = cy.get('button#display-settings').get(`input#${edgeLabel}`);
+  input.should('exist');
+  input.should('not.be.checked');
+});
+
