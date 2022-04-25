@@ -7626,8 +7626,10 @@ cypress-cucumber-preprocessor@^4.3.1:
     minimist "^1.2.5"
     through "^2.3.8"
 
-"cypress-react-selector@file:../../../../../../work/cypress-react-selector":
-  version "2.3.16"
+cypress-react-selector@^2.3.17:
+  version "2.3.17"
+  resolved "https://registry.yarnpkg.com/cypress-react-selector/-/cypress-react-selector-2.3.17.tgz#010382b486c4ec342ab61bcd121bb4ccd79e4590"
+  integrity sha512-yBi3wv5XUuzcYXearR0PN8lz0kMk44TOP4LVhwK1e4IU1fuWtlyVag1i+2eg0sdKRJ8VePEgmJhgZfOgd3VEgg==
   dependencies:
     resq "1.10.2"
 
