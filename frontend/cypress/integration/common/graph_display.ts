@@ -32,11 +32,11 @@ When('user enables {string} {string} edge labels', (radio, edgeLabel) => {
   cy.get(`input#${radio}`).check();
 });
 
-When('user enables {string} edge labels', (edgeLabel) => {
+When('user enables {string} edge labels', edgeLabel => {
   cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
 });
 
-When('user disables {string} edge labels', (edgeLabel) => {
+When('user disables {string} edge labels', edgeLabel => {
   cy.get('button#display-settings').get(`input#${edgeLabel}`).uncheck();
 });
 
@@ -54,12 +54,92 @@ Then('the display menu opens', () => {
   cy.get('button#display-settings').invoke('attr', 'aria-expanded').should('eq', 'true');
 });
 
+Then('the display menu has default settings', () => {
+  let input = cy.get('button#display-settings').get(`input#responseTime`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#throughput`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#trafficDistribution`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#trafficRate`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#boxByCluster`);
+  input.should('exist');
+  input.should('be.checked');
+  input = cy.get('button#display-settings').get(`input#boxByNamespace`);
+  input.should('exist');
+  input.should('be.checked');
+  input = cy.get('button#display-settings').get(`input#filterHide`);
+  input.should('exist');
+  input.should('be.checked');
+  input = cy.get('button#display-settings').get(`input#filterIdleEdges`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#filterIdleNodes`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#filterOperationNodes`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#rank`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#filterServiceNodes`);
+  input.should('exist');
+  input.should('be.checked');
+  input = cy.get('button#display-settings').get(`input#filterTrafficAnimation`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#filterSidecars`);
+  input.should('exist');
+  input.should('be.checked');
+  input = cy.get('button#display-settings').get(`input#filterSecurity`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input = cy.get('button#display-settings').get(`input#filterVS`);
+  input.should('exist');
+  input.should('be.checked');
+});
+
+Then('the graph reflects default settings', () => {
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      // no nonDefault edge label info
+      let numEdges = state.cy.edges(`[?responseTime],[?throughput]`).length;
+      assert.isTrue(numEdges === 0);
+
+      // no idle edges, mtls
+      numEdges = state.cy.edges(`[http = 0],[isMTLS > 0]`).length;
+      assert.isTrue(numEdges === 0);
+
+      // boxes
+      let numNodes = state.cy.nodes(`[isBox = "app"]`).length;
+      assert.isTrue(numNodes > 0);
+      numNodes = state.cy.nodes(`[isBox = "namespace"]`).length;
+      assert.isTrue(numNodes > 0);
+
+      // service nodes
+      numNodes = state.cy.nodes(`[nodeType = "service"]`).length;
+      assert.isTrue(numNodes > 0);
+ 
+      // a variety of not-found tests
+      numNodes = state.cy.nodes(`[isBox = "cluster"],[?isIdle],[?rank],[?hasMissingSC],[?hasVS],[nodeType = "operation"]`).length;
+      assert.isTrue(numNodes === 0);
+    });
+});
+
 Then('user sees {string} edge labels', el => {
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
     .getCurrentState()
     .then(state => {
-      const numEdges = state.cy.edges(`[?${el}]`).length;
+      const numEdges = state.cy.edges(`[${el} > 0]`).length;
       assert.isTrue(numEdges > 0);
     });
 });
@@ -69,4 +149,3 @@ Then('user sees {string} edge label option is closed', edgeLabel => {
   input.should('exist');
   input.should('not.be.checked');
 });
-
