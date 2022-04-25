@@ -29,6 +29,21 @@ Scenario: User clicks Display Menu
 # percentile variable must match input id
 # edge label variable must match edge data name
 @graph-page-display
+Scenario: Traffic Distribution edge labels
+  When user enables "trafficDistribution" edge labels
+  Then user sees "httpPercentReq" edge labels
+
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Uncheck throughput edge labels
+  When user disables "trafficDistribution" edge labels
+  Then user sees "trafficDistribution" edge label option is closed
+
+#######
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
 Scenario: Average Response-time edge labels
   When user enables "avg" "responseTime" edge labels
   Then user sees "responseTime" edge labels
@@ -59,3 +74,25 @@ Scenario: 99th Percentile Response-time edge labels
 Scenario: Uncheck response time edge labels
   When user disables "responseTime" edge labels
   Then user sees "responseTime" edge label option is closed
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Request Throughput edge labels
+  When user enables "throughputRequest" "throughput" edge labels
+  Then user sees "throughput" edge labels
+
+# percentile variable must match input id
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Response Throughput edge labels
+  When user enables "throughputResponse" "throughput" edge labels
+  Then user sees "throughput" edge labels
+
+# edge label variable must match edge data name
+@graph-page-display
+Scenario: Uncheck throughput edge labels
+  When user disables "throughput" edge labels
+  Then user sees "throughput" edge label option is closed
+
+

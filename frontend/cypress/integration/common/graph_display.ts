@@ -27,9 +27,13 @@ When('user opens display menu', () => {
   cy.get('button#display-settings').click();
 });
 
-When('user enables {string} {string} edge labels', (percentile, edgeLabel) => {
+When('user enables {string} {string} edge labels', (radio, edgeLabel) => {
   cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
-  cy.get(`input#${percentile}`).check();
+  cy.get(`input#${radio}`).check();
+});
+
+When('user enables {string} edge labels', (edgeLabel) => {
+  cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
 });
 
 When('user disables {string} edge labels', (edgeLabel) => {
