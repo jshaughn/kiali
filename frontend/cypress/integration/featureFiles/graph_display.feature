@@ -10,11 +10,13 @@ Feature: Kiali Graph page - Display menu
 #    When user graphs "" namespaces
 #    Then user sees no namespace selected
 
+# istio-system will only show nodes when idle-nodes is enabled
 @graph-page-display
-Scenario: Graph alpha and beta namespaces
-  When user graphs "alpha,beta" namespaces
+Scenario: Graph alpha and beta and istio-system namespaces
+  When user graphs "alpha,beta,istio-system" namespaces
   Then user sees the "alpha" namespace
   And user sees the "beta" namespace
+  And user sees the "istio-system" namespace
 
 @graph-page-display
 Scenario: User clicks Display Menu
@@ -57,7 +59,7 @@ Scenario: 99th Percentile Response-time edge labels
 # edge label variable must match edge data name
 @graph-page-display
 Scenario: Uncheck response time edge labels
-  When user disables "responseTime" edge labels
+  When user "disables" "responseTime" edge labels
   Then user sees "responseTime" edge label option is closed
 
 # percentile variable must match input id
@@ -77,31 +79,71 @@ Scenario: Response Throughput edge labels
 # edge label variable must match edge data name
 @graph-page-display
 Scenario: Uncheck throughput edge labels
-  When user disables "throughput" edge labels
+  When user "disables" "throughput" edge labels
   Then user sees "throughput" edge label option is closed
 
-# percentile variable must match input id
 # edge label variable must match edge data name
 @graph-page-display
-Scenario: Traffic Distribution edge labels
-  When user enables "trafficDistribution" edge labels
-  Then user sees "httpPercentReq" edge labels
+Scenario: Enable Traffic Distribution edge labels
+  When user "enables" "trafficDistribution" edge labels
+  Then user sees "trafficDistribution" edge labels
 
 # edge label variable must match edge data name
 @graph-page-display
-Scenario: Uncheck Traffic Distribution edge labels
-  When user disables "trafficDistribution" edge labels
+Scenario: Disable Traffic Distribution edge labels
+  When user "disables" "trafficDistribution" edge labels
   Then user sees "trafficDistribution" edge label option is closed
 
-# percentile variable must match input id
 # edge label variable must match edge data name
 @graph-page-display
-Scenario: Traffic Rate edge labels
-  When user enables "trafficRate" edge labels
-  Then user sees "http" edge labels
+Scenario: Enable Traffic Rate edge labels
+  When user "enables" "trafficRate" edge labels
+  Then user sees "trafficRate" edge labels
 
 # edge label variable must match edge data name
 @graph-page-display
-Scenario: Uncheck Traffic Distribution edge labels
-  When user disables "trafficRate" edge labels
+Scenario: Disable Traffic Distribution edge labels
+  When user "disables" "trafficRate" edge labels
   Then user sees "trafficRate" edge label option is closed
+
+# boxByType should be Capitalized
+@graph-page-display
+Scenario: User disables Cluster boxing
+  When user disables "Cluster" boxing
+  Then user does not see "Cluster" boxing
+
+# boxByType should be Capitalized
+@graph-page-display
+Scenario: User disables Namespace boxing
+  When user disables "Namespace" boxing
+  Then user does not see "Namespace" boxing
+
+@graph-page-display
+Scenario: User enables idle edges
+  When user "enables" idle edges
+  Then idle edges "appear" in the graph
+
+@graph-page-display
+Scenario: User enables idle nodes
+  When user "enables" idle nodes
+  Then idle nodes "appear" in the graph
+
+@graph-page-display
+Scenario: User disables idle edges
+  When user "disables" idle edges
+  Then idle edges "do not appear" in the graph
+
+@graph-page-display
+Scenario: User disables idle nodes
+  When user "disables" idle nodes
+  Then idle nodes "do not appear" in the graph
+
+@graph-page-display
+Scenario: User enables rank
+  When user "enables" rank
+  Then ranks "appear" in the graph
+
+@graph-page-display
+Scenario: User disables rank
+  When user "disables" rank
+  Then ranks "do not appear" in the graph

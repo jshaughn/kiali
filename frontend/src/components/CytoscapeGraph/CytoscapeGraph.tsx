@@ -795,8 +795,8 @@ export default class CytoscapeGraph extends React.Component<CytoscapeGraphProps,
     cy.scratch(CytoscapeGlobalScratchNamespace, globalScratchData);
 
     let elements = this.props.graphData.elements;
+    let scoringCriteria: ScoringCriteria[] = [];
     if (this.props.showRank) {
-      let scoringCriteria: ScoringCriteria[] = [];
       for (const ranking of this.props.rankBy) {
         if (ranking === RankMode.RANK_BY_INBOUND_EDGES) {
           scoringCriteria.push(ScoringCriteria.InboundEdges);
@@ -811,6 +811,8 @@ export default class CytoscapeGraph extends React.Component<CytoscapeGraphProps,
       if (this.props.setRankResult) {
         this.props.setRankResult({ upperBound });
       }
+    } else {
+      scoreNodes(this.props.graphData.elements, ...scoringCriteria);
     }
 
     // don't preserve any user pan/zoom when completely changing the layout

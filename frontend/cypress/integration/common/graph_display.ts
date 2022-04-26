@@ -32,12 +32,41 @@ When('user enables {string} {string} edge labels', (radio, edgeLabel) => {
   cy.get(`input#${radio}`).check();
 });
 
-When('user enables {string} edge labels', edgeLabel => {
-  cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
+When('user {string} {string} edge labels', (action, edgeLabel) => {
+  if (action === 'enables') {
+    cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
+  } else {
+    cy.get('button#display-settings').get(`input#${edgeLabel}`).uncheck();
+  }
 });
 
-When('user disables {string} edge labels', edgeLabel => {
-  cy.get('button#display-settings').get(`input#${edgeLabel}`).uncheck();
+When('user disables {string} boxing', boxByType => {
+  cy.get('button#display-settings').get(`input#boxBy${boxByType}`).uncheck();
+});
+
+When('user {string} idle edges', action => {
+  if (action === 'enables') {
+    cy.get('button#display-settings').get(`input#filterIdleEdges`).check();
+  } else {
+    cy.get('button#display-settings').get(`input#filterIdleEdges`).uncheck();
+  }
+});
+
+When('user {string} idle nodes', action => {
+  if (action === 'enables') {
+    cy.get('button#display-settings').get(`input#filterIdleNodes`).check();
+  } else {
+    cy.get('button#display-settings').get(`input#filterIdleNodes`).uncheck();
+  }
+});
+
+When('user {string} rank', action => {
+  if (action === 'enables') {
+    cy.get('button#display-settings').get(`input#rank`).check();
+    cy.get(`input#inboundEdges`).check();
+  } else {
+    cy.get('button#display-settings').get(`input#rank`).uncheck();
+  }
 });
 
 ///////////////////
@@ -115,7 +144,7 @@ Then('the graph reflects default settings', () => {
       assert.isTrue(numEdges === 0);
 
       // no idle edges, mtls
-      numEdges = state.cy.edges(`[http = 0],[isMTLS > 0]`).length;
+      numEdges = state.cy.edges(`[^hasTraffic],[isMTLS > 0]`).length;
       assert.isTrue(numEdges === 0);
 
       // boxes
@@ -127,19 +156,38 @@ Then('the graph reflects default settings', () => {
       // service nodes
       numNodes = state.cy.nodes(`[nodeType = "service"]`).length;
       assert.isTrue(numNodes > 0);
- 
+
       // a variety of not-found tests
-      numNodes = state.cy.nodes(`[isBox = "cluster"],[?isIdle],[?rank],[?hasMissingSC],[?hasVS],[nodeType = "operation"]`).length;
+      numNodes = state.cy.nodes(
+        `[isBox = "cluster"],[?isIdle],[?rank],[?hasMissingSC],[?hasVS],[nodeType = "operation"]`
+      ).length;
       assert.isTrue(numNodes === 0);
     });
 });
 
 Then('user sees {string} edge labels', el => {
+  const input = cy.get('button#display-settings').get(`input#${el}`);
+  input.should('exist');
+  input.should('be.checked');
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  let rate;
+  switch (el) {
+    case 'trafficDistribution':
+      rate = 'httpPercentReq';
+      break;
+    case 'trafficRate':
+      rate = 'http';
+      break;
+    default:
+      rate = el;
+  }
+
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
     .getCurrentState()
     .then(state => {
-      const numEdges = state.cy.edges(`[${el} > 0]`).length;
+      const numEdges = state.cy.edges(`[${rate}" > 0]`).length;
       assert.isTrue(numEdges > 0);
     });
 });
@@ -148,4 +196,88 @@ Then('user sees {string} edge label option is closed', edgeLabel => {
   const input = cy.get('button#display-settings').get(`input#${edgeLabel}`);
   input.should('exist');
   input.should('not.be.checked');
+});
+
+Then('user does not see {string} boxing', (boxByType: string) => {
+  const input = cy.get('button#display-settings').get(`input#boxBy${boxByType}`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      const numBoxes = state.cy.nodes(`[isBox = "${boxByType.toLowerCase()}"]`).length;
+      assert.isTrue(numBoxes === 0);
+    });
+});
+
+Then('idle edges {string} in the graph', action => {
+  const input = cy.get('button#display-settings').get(`input#filterIdleEdges`);
+  input.should('exist');
+  if (action === 'appear') {
+    input.should('be.checked');
+  } else {
+    input.should('not.be.checked');
+  }
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      const numEdges = state.cy.edges(`[^hasTraffic]`).length;
+      if (action === 'appear') {
+        assert.isTrue(numEdges > 0);
+      } else {
+        assert.isTrue(numEdges === 0);
+      }
+    });
+});
+
+Then('idle nodes {string} in the graph', action => {
+  const input = cy.get('button#display-settings').get(`input#filterIdleNodes`);
+  input.should('exist');
+  if (action === 'appear') {
+    input.should('be.checked');
+  } else {
+    input.should('not.be.checked');
+  }
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      const numNodes = state.cy.nodes(`[?isIdle]`).length;
+      if (action === 'appear') {
+        assert.isTrue(numNodes > 0);
+      } else {
+        assert.isTrue(numNodes === 0);
+      }
+    });
+});
+
+Then('ranks {string} in the graph', action => {
+  const input = cy.get('button#display-settings').get(`input#rank`);
+  input.should('exist');
+  if (action === 'appear') {
+    input.should('be.checked');
+  } else {
+    input.should('not.be.checked');
+  }
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      const numNodes = state.cy.nodes(`[rank > 0]`).length;
+      if (action === 'appear') {
+        assert.isTrue(numNodes > 0);
+      } else {
+        assert.isTrue(numNodes === 0);
+      }
+    });
 });
