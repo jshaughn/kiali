@@ -40,32 +40,50 @@ When('user {string} {string} edge labels', (action, edgeLabel) => {
   }
 });
 
-When('user disables {string} boxing', boxByType => {
-  cy.get('button#display-settings').get(`input#boxBy${boxByType}`).uncheck();
-});
-
-When('user {string} idle edges', action => {
-  if (action === 'enables') {
-    cy.get('button#display-settings').get(`input#filterIdleEdges`).check();
-  } else {
-    cy.get('button#display-settings').get(`input#filterIdleEdges`).uncheck();
+When('user {string} {string} option', (action, option: string) => {
+  let id: string;
+  switch (option.toLowerCase()) {
+    case 'cluster boxes':
+      option = 'boxByCluster';
+      break;
+    case 'idle edges':
+      option = 'filterIdleEdges';
+      break;
+    case 'idle nodes':
+      option = 'filterIdleNodes';
+      break;
+    case 'missing sidecars':
+      option = 'filterSidecars';
+      break;
+    case 'namespace boxes':
+      option = 'boxByNamespace';
+      break;
+    case 'rank':
+      option = 'rank';
+      break;
+    case 'service nodes':
+      option = 'filterServiceNodes';
+      break;
+    case 'security':
+      option = 'filterSecurity';
+      break;
+    case 'traffic animation':
+      option = 'filterTrafficAnimation';
+      break;
+    case 'virtual services':
+      option = 'filterVS';
+      break;
+    default:
+      option = 'xxx';
   }
-});
 
-When('user {string} idle nodes', action => {
   if (action === 'enables') {
-    cy.get('button#display-settings').get(`input#filterIdleNodes`).check();
+    cy.get('button#display-settings').get(`input#${option}`).check();
+    if (option === 'rank') {
+      cy.get(`input#inboundEdges`).check();
+    }
   } else {
-    cy.get('button#display-settings').get(`input#filterIdleNodes`).uncheck();
-  }
-});
-
-When('user {string} rank', action => {
-  if (action === 'enables') {
-    cy.get('button#display-settings').get(`input#rank`).check();
-    cy.get(`input#inboundEdges`).check();
-  } else {
-    cy.get('button#display-settings').get(`input#rank`).uncheck();
+    cy.get('button#display-settings').get(`input#${option}`).uncheck();
   }
 });
 
@@ -280,4 +298,68 @@ Then('ranks {string} in the graph', action => {
         assert.isTrue(numNodes === 0);
       }
     });
+});
+
+Then('user does not see service nodes', () => {
+  const input = cy.get('button#display-settings').get(`input#filterServiceNodes`);
+  input.should('exist');
+  input.should('not.be.checked');
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      const numBoxes = state.cy.nodes(`[nodeType = "service"][^isOutside]`).length;
+      assert.isTrue(numBoxes === 0);
+    });
+});
+
+Then('security {string} in the graph', action => {
+  const input = cy.get('button#display-settings').get(`input#filterSecurity`);
+  input.should('exist');
+  if (action === 'appears') {
+    input.should('be.checked');
+  } else {
+    input.should('not.be.checked');
+  }
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+
+  cy.waitForReact(1000, '#root');
+  cy.getReact('CytoscapeGraph')
+    .getCurrentState()
+    .then(state => {
+      const numEdges = state.cy.edges(`[isMTLS > 0]`).length;
+      if (action === 'appears') {
+        assert.isTrue(numEdges > 0);
+      } else {
+        assert.isTrue(numEdges === 0);
+      }
+    });
+});
+
+Then('{string} option {string} in the graph', (option, action) => {
+  let id: string;
+  switch (option.toLowerCase()) {
+    case 'missing sidecars':
+      option = 'filterSidecars';
+      break;
+    case 'traffic animation':
+      option = 'filterTrafficAnimation';
+      break;
+    case 'virtual services':
+      option = 'filterVS';
+      break;
+    default:
+      option = 'xxx';
+  }
+
+  const input = cy.get('button#display-settings').get(`input#${option}`);
+  input.should('exist');
+  if (action === 'appears') {
+    input.should('be.checked');
+  } else {
+    input.should('not.be.checked');
+  }
+  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
 });
