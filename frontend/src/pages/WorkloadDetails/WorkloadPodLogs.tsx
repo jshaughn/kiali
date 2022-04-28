@@ -409,7 +409,7 @@ export class WorkloadPodLogs extends React.Component<WorkloadPodLogsProps, Workl
           {this.state.containerOptions!.map((c, i) => {
             return (
               <Checkbox
-                id={`container-${i}`}
+                id={`container-${c.displayName}`}
                 key={`c-d-${i}`}
                 isChecked={c.isSelected}
                 label={
