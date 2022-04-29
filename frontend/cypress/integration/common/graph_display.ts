@@ -102,54 +102,22 @@ Then('the display menu opens', () => {
 });
 
 Then('the display menu has default settings', () => {
-  let input = cy.get('button#display-settings').get(`input#responseTime`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#throughput`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#trafficDistribution`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#trafficRate`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#boxByCluster`);
-  input.should('exist');
-  input.should('be.checked');
-  input = cy.get('button#display-settings').get(`input#boxByNamespace`);
-  input.should('exist');
-  input.should('be.checked');
-  input = cy.get('button#display-settings').get(`input#filterHide`);
-  input.should('exist');
-  input.should('be.checked');
-  input = cy.get('button#display-settings').get(`input#filterIdleEdges`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#filterIdleNodes`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#filterOperationNodes`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#rank`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#filterServiceNodes`);
-  input.should('exist');
-  input.should('be.checked');
-  input = cy.get('button#display-settings').get(`input#filterTrafficAnimation`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#filterSidecars`);
-  input.should('exist');
-  input.should('be.checked');
-  input = cy.get('button#display-settings').get(`input#filterSecurity`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input = cy.get('button#display-settings').get(`input#filterVS`);
-  input.should('exist');
-  input.should('be.checked');
+  cy.get('button#display-settings').get(`input#responseTime`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#throughput`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#trafficDistribution`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#trafficRate`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#boxByCluster`).should('exist').should('be.checked');
+  cy.get('button#display-settings').get(`input#boxByNamespace`).should('exist').should('be.checked');
+  cy.get('button#display-settings').get(`input#filterHide`).should('exist').should('be.checked');
+  cy.get('button#display-settings').get(`input#filterIdleEdges`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#filterIdleNodes`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#filterOperationNodes`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#rank`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#filterServiceNodes`).should('exist').should('be.checked');
+  cy.get('button#display-settings').get(`input#filterTrafficAnimation`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#filterSidecars`).should('exist').should('be.checked');
+  cy.get('button#display-settings').get(`input#filterSecurity`).should('exist').should('not.be.checked');
+  cy.get('button#display-settings').get(`input#filterVS`).should('exist').should('be.checked');
 });
 
 Then('the graph reflects default settings', () => {
@@ -184,10 +152,7 @@ Then('the graph reflects default settings', () => {
 });
 
 Then('user sees {string} edge labels', el => {
-  const input = cy.get('button#display-settings').get(`input#${el}`);
-  input.should('exist');
-  input.should('be.checked');
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput(el, 'appear');
 
   let rate;
   switch (el) {
@@ -211,16 +176,11 @@ Then('user sees {string} edge labels', el => {
 });
 
 Then('user sees {string} edge label option is closed', edgeLabel => {
-  const input = cy.get('button#display-settings').get(`input#${edgeLabel}`);
-  input.should('exist');
-  input.should('not.be.checked');
+  validateInput(edgeLabel, 'does not appear');
 });
 
 Then('user does not see {string} boxing', (boxByType: string) => {
-  const input = cy.get('button#display-settings').get(`input#boxBy${boxByType}`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput(`boxBy${boxByType}`, 'does not appear');
 
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
@@ -232,14 +192,7 @@ Then('user does not see {string} boxing', (boxByType: string) => {
 });
 
 Then('idle edges {string} in the graph', action => {
-  const input = cy.get('button#display-settings').get(`input#filterIdleEdges`);
-  input.should('exist');
-  if (action === 'appear') {
-    input.should('be.checked');
-  } else {
-    input.should('not.be.checked');
-  }
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput('filterIdleEdges', action);
 
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
@@ -255,14 +208,7 @@ Then('idle edges {string} in the graph', action => {
 });
 
 Then('idle nodes {string} in the graph', action => {
-  const input = cy.get('button#display-settings').get(`input#filterIdleNodes`);
-  input.should('exist');
-  if (action === 'appear') {
-    input.should('be.checked');
-  } else {
-    input.should('not.be.checked');
-  }
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput('filterIdleNodes', action);
 
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
@@ -278,14 +224,7 @@ Then('idle nodes {string} in the graph', action => {
 });
 
 Then('ranks {string} in the graph', action => {
-  const input = cy.get('button#display-settings').get(`input#rank`);
-  input.should('exist');
-  if (action === 'appear') {
-    input.should('be.checked');
-  } else {
-    input.should('not.be.checked');
-  }
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput('rank', action);
 
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
@@ -301,10 +240,7 @@ Then('ranks {string} in the graph', action => {
 });
 
 Then('user does not see service nodes', () => {
-  const input = cy.get('button#display-settings').get(`input#filterServiceNodes`);
-  input.should('exist');
-  input.should('not.be.checked');
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput('filterServiceNodes', 'do not appear');
 
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
@@ -316,14 +252,7 @@ Then('user does not see service nodes', () => {
 });
 
 Then('security {string} in the graph', action => {
-  const input = cy.get('button#display-settings').get(`input#filterSecurity`);
-  input.should('exist');
-  if (action === 'appears') {
-    input.should('be.checked');
-  } else {
-    input.should('not.be.checked');
-  }
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput('filterSecurity', action);
 
   cy.waitForReact(1000, '#root');
   cy.getReact('CytoscapeGraph')
@@ -354,12 +283,21 @@ Then('{string} option {string} in the graph', (option, action) => {
       option = 'xxx';
   }
 
-  const input = cy.get('button#display-settings').get(`input#${option}`);
-  input.should('exist');
-  if (action === 'appears') {
-    input.should('be.checked');
-  } else {
-    input.should('not.be.checked');
-  }
-  input.should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  validateInput(option, action);
 });
+
+function validateInput(option: string, action: string) {
+  if (action.startsWith('appear')) {
+    cy.get('button#display-settings')
+      .get(`input#${option}`)
+      .should('exist')
+      .should('be.checked')
+      .should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  } else {
+    cy.get('button#display-settings')
+      .get(`input#${option}`)
+      .should('exist')
+      .should('not.be.checked')
+      .should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
+  }
+}
