@@ -28,15 +28,15 @@ When('user opens display menu', () => {
 });
 
 When('user enables {string} {string} edge labels', (radio, edgeLabel) => {
-  cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
+  cy.get('div#graph-display-menu').find(`input#${edgeLabel}`).check();
   cy.get(`input#${radio}`).check();
 });
 
 When('user {string} {string} edge labels', (action, edgeLabel) => {
   if (action === 'enables') {
-    cy.get('button#display-settings').get(`input#${edgeLabel}`).check();
+    cy.get('div#graph-display-menu').find(`input#${edgeLabel}`).check();
   } else {
-    cy.get('button#display-settings').get(`input#${edgeLabel}`).uncheck();
+    cy.get('div#graph-display-menu').find(`input#${edgeLabel}`).uncheck();
   }
 });
 
@@ -78,12 +78,12 @@ When('user {string} {string} option', (action, option: string) => {
   }
 
   if (action === 'enables') {
-    cy.get('button#display-settings').get(`input#${option}`).check();
+    cy.get('div#graph-display-menu').find(`input#${option}`).check();
     if (option === 'rank') {
       cy.get(`input#inboundEdges`).check();
     }
   } else {
-    cy.get('button#display-settings').get(`input#${option}`).uncheck();
+    cy.get('div#graph-display-menu').find(`input#${option}`).uncheck();
   }
 });
 
@@ -99,25 +99,28 @@ Then(`user sees the {string} namespace`, ns => {
 
 Then('the display menu opens', () => {
   cy.get('button#display-settings').invoke('attr', 'aria-expanded').should('eq', 'true');
+  cy.get('div#graph-display-menu').should('exist');
 });
 
 Then('the display menu has default settings', () => {
-  cy.get('button#display-settings').get(`input#responseTime`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#throughput`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#trafficDistribution`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#trafficRate`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#boxByCluster`).should('exist').should('be.checked');
-  cy.get('button#display-settings').get(`input#boxByNamespace`).should('exist').should('be.checked');
-  cy.get('button#display-settings').get(`input#filterHide`).should('exist').should('be.checked');
-  cy.get('button#display-settings').get(`input#filterIdleEdges`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#filterIdleNodes`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#filterOperationNodes`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#rank`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#filterServiceNodes`).should('exist').should('be.checked');
-  cy.get('button#display-settings').get(`input#filterTrafficAnimation`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#filterSidecars`).should('exist').should('be.checked');
-  cy.get('button#display-settings').get(`input#filterSecurity`).should('exist').should('not.be.checked');
-  cy.get('button#display-settings').get(`input#filterVS`).should('exist').should('be.checked');
+  cy.get('div#graph-display-menu').within(() => {
+    cy.get(`input#responseTime`).should('exist').should('not.be.checked');
+    cy.get(`input#throughput`).should('exist').should('not.be.checked');
+    cy.get(`input#trafficDistribution`).should('exist').should('not.be.checked');
+    cy.get(`input#trafficRate`).should('exist').should('not.be.checked');
+    cy.get(`input#boxByCluster`).should('exist').should('be.checked');
+    cy.get(`input#boxByNamespace`).should('exist').should('be.checked');
+    cy.get(`input#filterHide`).should('exist').should('be.checked');
+    cy.get(`input#filterIdleEdges`).should('exist').should('not.be.checked');
+    cy.get(`input#filterIdleNodes`).should('exist').should('not.be.checked');
+    cy.get(`input#filterOperationNodes`).should('exist').should('not.be.checked');
+    cy.get(`input#rank`).should('exist').should('not.be.checked');
+    cy.get(`input#filterServiceNodes`).should('exist').should('be.checked');
+    cy.get(`input#filterTrafficAnimation`).should('exist').should('not.be.checked');
+    cy.get(`input#filterSidecars`).should('exist').should('be.checked');
+    cy.get(`input#filterSecurity`).should('exist').should('not.be.checked');
+    cy.get(`input#filterVS`).should('exist').should('be.checked');
+  });
 });
 
 Then('the graph reflects default settings', () => {
@@ -288,14 +291,14 @@ Then('{string} option {string} in the graph', (option, action) => {
 
 function validateInput(option: string, action: string) {
   if (action.startsWith('appear')) {
-    cy.get('button#display-settings')
-      .get(`input#${option}`)
+    cy.get('div#graph-display-menu')
+      .find(`input#${option}`)
       .should('exist')
       .should('be.checked')
       .should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
   } else {
-    cy.get('button#display-settings')
-      .get(`input#${option}`)
+    cy.get('div#graph-display-menu')
+      .find(`input#${option}`)
       .should('exist')
       .should('not.be.checked')
       .should('not.be.disabled'); // this forces a wait, enables when graph is refreshed
