@@ -318,6 +318,12 @@ export interface DestService {
   namespace: string;
 }
 
+// ExtInfo contains client-side info about the extension
+export interface ExtInfo {
+  name: string;
+  url?: string; // URL is an optional URL that links to the extension's own external UI
+}
+
 export interface SEInfo {
   hosts: string[];
   location: string;
@@ -382,7 +388,7 @@ export interface GraphNodeData {
   isAmbient?: boolean;
   isBox?: string;
   isDead?: boolean;
-  isExtension?: string;
+  isExtension?: ExtInfo;
   isGateway?: {
     egressInfo?: {
       hostnames?: string[];
