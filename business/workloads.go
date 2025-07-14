@@ -262,15 +262,16 @@ func (in *WorkloadService) GetWorkloadList(ctx context.Context, criteria Workloa
 	var istioConfigMap models.IstioConfigMap
 
 	if criteria.IncludeIstioResources {
+		include := cluster != in.conf.KubernetesConfig.ClusterName || !in.conf.Clustering.IgnoreLocalCluster
 		istioConfigCriteria := IstioConfigCriteria{
-			IncludeAuthorizationPolicies:  true,
-			IncludeEnvoyFilters:           true,
-			IncludeGateways:               true,
-			IncludeK8sGateways:            true,
-			IncludePeerAuthentications:    true,
-			IncludeRequestAuthentications: true,
-			IncludeSidecars:               true,
-			IncludeWorkloadGroups:         true,
+			IncludeAuthorizationPolicies:  include,
+			IncludeEnvoyFilters:           include,
+			IncludeGateways:               include,
+			IncludeK8sGateways:            include,
+			IncludePeerAuthentications:    include,
+			IncludeRequestAuthentications: include,
+			IncludeSidecars:               include,
+			IncludeWorkloadGroups:         include,
 		}
 
 		go func(ctx context.Context) {
@@ -812,6 +813,8 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 
 	ws := models.Workloads{}
 
+	includeIstioWorkloads := cluster != in.conf.KubernetesConfig.ClusterName || !in.conf.Clustering.IgnoreLocalCluster
+
 	// Check if user has access to the namespace (RBAC) in cache scenarios and/or
 	// if namespace is accessible from Kiali (Deployment.AccessibleNamespaces)
 	if _, err := in.businessLayer.Namespace.GetClusterNamespace(ctx, namespace, cluster); err != nil {
@@ -840,19 +843,19 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 
 	podList := &core_v1.PodList{}
 	if err := kubeCache.List(ctx, podList, inNamespaceOpt, selectorOpt); err != nil {
-		return nil, fmt.Errorf("Error fetching Pods per namespace %s: %s", namespace, err)
+		return nil, fmt.Errorf("Error fetching Pods per namespace [%s][%s]: %s", cluster, namespace, err)
 	}
 	pods = podList.Items
 
 	depList := &apps_v1.DeploymentList{}
 	if err := kubeCache.List(ctx, depList, inNamespaceOpt); err != nil {
-		return nil, fmt.Errorf("Error fetching Deployments per namespace %s: %s", namespace, err)
+		return nil, fmt.Errorf("Error fetching Deployments per namespace [%s][%s]: %s", cluster, namespace, err)
 	}
 	dep = depList.Items
 
 	repList := &apps_v1.ReplicaSetList{}
 	if err := kubeCache.List(ctx, repList, inNamespaceOpt); err != nil {
-		return nil, fmt.Errorf("Error fetching ReplicaSets per namespace %s: %s", namespace, err)
+		return nil, fmt.Errorf("Error fetching ReplicaSets per namespace [%s][%s]: %s", cluster, namespace, err)
 	}
 	repset = repList.Items
 
@@ -866,7 +869,7 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 			// No Cache for ReplicationControllers
 			repcon, err = client.GetReplicationControllers(namespace)
 			if err != nil {
-				log.Errorf("Error fetching GetReplicationControllers per namespace %s: %s", namespace, err)
+				log.Errorf("Error fetching GetReplicationControllers per namespace [%s][%s]: %s", cluster, namespace, err)
 				errChan <- err
 			}
 		}
@@ -882,7 +885,7 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 			// No cache for DeploymentConfigs
 			depcon, err = client.GetDeploymentConfigs(ctx, namespace)
 			if err != nil {
-				log.Errorf("Error fetching DeploymentConfigs per namespace %s: %s", namespace, err)
+				log.Errorf("Error fetching DeploymentConfigs per namespace [%s][%s]: %s", cluster, namespace, err)
 				errChan <- err
 			}
 		}
@@ -892,7 +895,7 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 	if in.isWorkloadIncluded(kubernetes.StatefulSetType) {
 		setList := &apps_v1.StatefulSetList{}
 		if err := kubeCache.List(ctx, setList, inNamespaceOpt); err != nil {
-			return nil, fmt.Errorf("Error fetching StatefulSets per namespace %s: %s", namespace, err)
+			return nil, fmt.Errorf("Error fetching StatefulSets per namespace [%s][%s]: %s", cluster, namespace, err)
 		}
 		fulset = setList.Items
 	}
@@ -907,7 +910,7 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 			// No cache for Cronjobs
 			conjbs, err = client.GetCronJobs(namespace)
 			if err != nil {
-				log.Errorf("Error fetching CronJobs per namespace %s: %s", namespace, err)
+				log.Errorf("Error fetching CronJobs per namespace [%s][%s]: %s", cluster, namespace, err)
 				errChan <- err
 			}
 		}
@@ -923,7 +926,7 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 			// No cache for Jobs
 			jbs, err = client.GetJobs(namespace)
 			if err != nil {
-				log.Errorf("Error fetching Jobs per namespace %s: %s", namespace, err)
+				log.Errorf("Error fetching Jobs per namespace [%s][%s]: %s", cluster, namespace, err)
 				errChan <- err
 			}
 		}
@@ -933,34 +936,34 @@ func (in *WorkloadService) fetchWorkloadsFromCluster(ctx context.Context, cluste
 	if in.isWorkloadIncluded(kubernetes.DaemonSetType) {
 		daeList := &apps_v1.DaemonSetList{}
 		if err := kubeCache.List(ctx, daeList, inNamespaceOpt); err != nil {
-			return nil, fmt.Errorf("Error fetching DaemonSets per namespace %s: %s", namespace, err)
+			return nil, fmt.Errorf("Error fetching DaemonSets per namespace [%s][%s]: %s", cluster, namespace, err)
 		}
 		daeset = daeList.Items
 	}
 
 	// WorkloadGroups are fetched only when included
-	if in.isWorkloadIncluded(kubernetes.WorkloadGroupType) {
+	if includeIstioWorkloads && in.isWorkloadIncluded(kubernetes.WorkloadGroupType) {
 		wgroupList := &networking_v1.WorkloadGroupList{}
 		if err := kubeCache.List(ctx, wgroupList, inNamespaceOpt); err != nil {
-			return nil, fmt.Errorf("Error fetching WorkloadGroups per namespace %s: %s", namespace, err)
+			return nil, fmt.Errorf("Error fetching WorkloadGroups per namespace [%s][%s]: %s", cluster, namespace, err)
 		}
 		wgroups = wgroupList.Items
 	}
 
 	// WorkloadEntries are fetched only when included
-	if in.isWorkloadIncluded(kubernetes.WorkloadEntryType) {
+	if includeIstioWorkloads && in.isWorkloadIncluded(kubernetes.WorkloadEntryType) {
 		wentryList := &networking_v1.WorkloadEntryList{}
 		if err := kubeCache.List(ctx, wentryList, inNamespaceOpt); err != nil {
-			return nil, fmt.Errorf("Error fetching WorkloadEntries per namespace %s: %s", namespace, err)
+			return nil, fmt.Errorf("Error fetching WorkloadEntries per namespace [%s][%s]: %s", cluster, namespace, err)
 		}
 		wentries = wentryList.Items
 	}
 
 	// Sidecars are fetched only when included
-	if in.isWorkloadIncluded(kubernetes.SidecarType) {
+	if includeIstioWorkloads && in.isWorkloadIncluded(kubernetes.SidecarType) {
 		sidecarList := &networking_v1.SidecarList{}
 		if err := kubeCache.List(ctx, sidecarList, inNamespaceOpt); err != nil {
-			return nil, fmt.Errorf("Error fetching Sidecars per namespace %s: %s", namespace, err)
+			return nil, fmt.Errorf("Error fetching Sidecars per namespace [%s][%s]: %s", cluster, namespace, err)
 		}
 		sidecars = sidecarList.Items
 	}
