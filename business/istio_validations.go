@@ -288,22 +288,21 @@ func (in *IstioValidationsService) Validate(ctx context.Context, cluster string,
 	}
 
 	// grab all config for the cluster
-	include := cluster != in.conf.KubernetesConfig.ClusterName || !in.conf.Clustering.IgnoreHomeCluster
 	criteria := IstioConfigCriteria{
-		IncludeAuthorizationPolicies:  include,
-		IncludeDestinationRules:       include,
-		IncludeGateways:               include,
-		IncludeK8sGateways:            include,
-		IncludeK8sGRPCRoutes:          include,
-		IncludeK8sHTTPRoutes:          include,
-		IncludeK8sReferenceGrants:     include,
-		IncludePeerAuthentications:    include,
-		IncludeRequestAuthentications: include,
-		IncludeServiceEntries:         include,
-		IncludeSidecars:               include,
-		IncludeVirtualServices:        include,
-		IncludeWorkloadEntries:        include,
-		IncludeWorkloadGroups:         include,
+		IncludeAuthorizationPolicies:  true,
+		IncludeDestinationRules:       true,
+		IncludeGateways:               true,
+		IncludeK8sGateways:            true,
+		IncludeK8sGRPCRoutes:          true,
+		IncludeK8sHTTPRoutes:          true,
+		IncludeK8sReferenceGrants:     true,
+		IncludePeerAuthentications:    true,
+		IncludeRequestAuthentications: true,
+		IncludeServiceEntries:         true,
+		IncludeSidecars:               true,
+		IncludeVirtualServices:        true,
+		IncludeWorkloadEntries:        true,
+		IncludeWorkloadGroups:         true,
 	}
 	istioConfigList, err := in.istioConfig.GetIstioConfigListForCluster(ctx, cluster, meta_v1.NamespaceAll, criteria)
 	if err != nil {
@@ -534,22 +533,21 @@ func (in *IstioValidationsService) ValidateIstioObject(ctx context.Context, clus
 		mtlsDetails: &kubernetes.MTLSDetails{},
 	}
 
-	include := cluster != in.conf.KubernetesConfig.ClusterName || !in.conf.Clustering.IgnoreHomeCluster
 	criteria := IstioConfigCriteria{
-		IncludeAuthorizationPolicies:  include,
-		IncludeDestinationRules:       include,
-		IncludeGateways:               include,
-		IncludeK8sGateways:            include,
-		IncludeK8sGRPCRoutes:          include,
-		IncludeK8sHTTPRoutes:          include,
-		IncludeK8sReferenceGrants:     include,
-		IncludePeerAuthentications:    include,
-		IncludeRequestAuthentications: include,
-		IncludeServiceEntries:         include,
-		IncludeSidecars:               include,
-		IncludeVirtualServices:        include,
-		IncludeWorkloadEntries:        include,
-		IncludeWorkloadGroups:         include,
+		IncludeAuthorizationPolicies:  true,
+		IncludeDestinationRules:       true,
+		IncludeGateways:               true,
+		IncludeK8sGateways:            true,
+		IncludeK8sGRPCRoutes:          true,
+		IncludeK8sHTTPRoutes:          true,
+		IncludeK8sReferenceGrants:     true,
+		IncludePeerAuthentications:    true,
+		IncludeRequestAuthentications: true,
+		IncludeServiceEntries:         true,
+		IncludeSidecars:               true,
+		IncludeVirtualServices:        true,
+		IncludeWorkloadEntries:        true,
+		IncludeWorkloadGroups:         true,
 	}
 	clusterIstioConfigList, err := in.istioConfig.GetIstioConfigListForCluster(ctx, cluster, meta_v1.NamespaceAll, criteria)
 	if err != nil {

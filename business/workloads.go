@@ -262,16 +262,15 @@ func (in *WorkloadService) GetWorkloadList(ctx context.Context, criteria Workloa
 	var istioConfigMap models.IstioConfigMap
 
 	if criteria.IncludeIstioResources {
-		include := cluster != in.conf.KubernetesConfig.ClusterName || !in.conf.Clustering.IgnoreHomeCluster
 		istioConfigCriteria := IstioConfigCriteria{
-			IncludeAuthorizationPolicies:  include,
-			IncludeEnvoyFilters:           include,
-			IncludeGateways:               include,
-			IncludeK8sGateways:            include,
-			IncludePeerAuthentications:    include,
-			IncludeRequestAuthentications: include,
-			IncludeSidecars:               include,
-			IncludeWorkloadGroups:         include,
+			IncludeAuthorizationPolicies:  true,
+			IncludeEnvoyFilters:           true,
+			IncludeGateways:               true,
+			IncludeK8sGateways:            true,
+			IncludePeerAuthentications:    true,
+			IncludeRequestAuthentications: true,
+			IncludeSidecars:               true,
+			IncludeWorkloadGroups:         true,
 		}
 
 		go func(ctx context.Context) {
