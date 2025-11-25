@@ -43,7 +43,7 @@ jobs:
         branch: ${{fromJson(needs.initialize.outputs.branches)}}          
     steps:                
       - name: Checkout Backend
-        uses: actions/checkout@v5        
+        uses: actions/checkout@v6        
         with:
           ref: ${{matrix.branch}}          
       - name: Configure git backend
@@ -77,7 +77,7 @@ jobs:
       # Check if version requested have the UI in our kiali/kiali-ui repo
       - name: Checkout UI
         if: ${{ matrix.branch == 'v1.24' || matrix.branch == 'v1.36'}}
-        uses: actions/checkout@v5        
+        uses: actions/checkout@v6        
         with:
           token: ${{ secrets.KIALI_TOKEN || github.token}}
           repository: kiali/kiali-ui
