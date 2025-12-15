@@ -76,7 +76,7 @@ jobs:
           kubectl get pods -l app.kubernetes.io/name=kiali -n istio-system -o yaml
 
       - name: Upload cypress screenshots when tests fail
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: failure()
         with:
           name: cypress-screenshots
