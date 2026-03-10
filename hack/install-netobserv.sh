@@ -589,13 +589,45 @@ install_istio() {
     return 1
   fi
 
-  "${SCRIPT_DIR}/istio/install-istio-via-sail.sh"
+  "${SCRIPT_DIR}/istio/install-istio-via-sail.sh" --addons "" --set '.spec.values.pilot.autoscaleEnabled = false'
   if [ $? -ne 0 ]; then
     errormsg "Istio installation failed"
     return 1
   fi
 
   infomsg "Istio installed successfully"
+
+  # On OpenShift, the Istio CNI plugin is required even for sidecar mode because
+  # the sidecar injector annotates pods with k8s.v1.cni.cncf.io/networks=istio-cni,
+  # which Multus resolves via a NetworkAttachmentDefinition. Without IstioCNI, pods
+  # fail to start with "cannot find a network-attachment-definition (istio-cni)".
+  # The install-istio-via-sail.sh script only creates IstioCNI for ambient mode,
+  # so we create it here for sidecar mode on OpenShift.
+  if ! ${CLIENT_EXE} get istiocni default &>/dev/null 2>&1; then
+    infomsg "Creating IstioCNI for OpenShift (required for Multus CNI integration)..."
+    ${CLIENT_EXE} create namespace istio-cni 2>/dev/null || true
+    cat <<EOF | ${CLIENT_EXE} apply -f -
+apiVersion: sailoperator.io/v1
+kind: IstioCNI
+metadata:
+  name: default
+spec:
+  namespace: istio-cni
+EOF
+    infomsg "Waiting for IstioCNI DaemonSet to be ready..."
+    local waited=0
+    while ! ${CLIENT_EXE} get daemonset -n istio-cni -l app=istio-cni-node &>/dev/null 2>&1; do
+      if [ ${waited} -ge 60 ]; then
+        warnmsg "IstioCNI DaemonSet not found after 60s, continuing..."
+        break
+      fi
+      sleep 5
+      waited=$((waited + 5))
+    done
+    ${CLIENT_EXE} rollout status daemonset -l app=istio-cni-node -n istio-cni --timeout=120s 2>/dev/null || true
+  else
+    infomsg "IstioCNI already exists"
+  fi
 
   # Fix namespace label so user-workload Prometheus can handle ServiceMonitors
   fix_istio_system_namespace
@@ -772,16 +804,26 @@ install_kiali() {
     return 1
   fi
 
+  # Locate helm binary
+  local helm_exe="${HELM:-$(which helm 2>/dev/null)}"
+  if [ -z "${helm_exe}" ]; then
+    errormsg "helm not found. Install helm or set HELM=/path/to/helm"
+    return 1
+  fi
+  infomsg "Using helm: ${helm_exe}"
+
   # Build and deploy Kiali
   pushd "${KIALI_REPO_DIR}" > /dev/null
   if [ "${SKIP_BUILD}" == "true" ]; then
     infomsg "Skipping build (--skip-build specified)..."
+    HELM="${helm_exe}" \
     HELM_CHARTS_REPO_PULL=false \
     AUTH_STRATEGY=anonymous \
     CLUSTER_TYPE=openshift \
       make cluster-push operator-create kiali-create
   else
     infomsg "Building and deploying Kiali (this may take several minutes)..."
+    HELM="${helm_exe}" \
     HELM_CHARTS_REPO_PULL=false \
     AUTH_STRATEGY=anonymous \
     CLUSTER_TYPE=openshift \
