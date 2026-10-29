@@ -928,19 +928,14 @@ func TestGetAppTracesKeepsResourceAttributedTempoTraces(t *testing.T) {
 	traceClient.AssertExpectations(t)
 }
 
-// TestTraceAuthorizationServiceNamespace pins that the OTel semantic
-// convention service.namespace authorizes a trace on both paths: Kiali's
-// own self-tracing (and any conventionally instrumented application)
-// carries the namespace only as that resource attribute. On the details
-// path it is surfaced as a process tag; on the Tempo search path it arrives
-// as a span tag selected by the query.
-func TestTraceAuthorizationServiceNamespace(t *testing.T) {
-	require := require.New(t)
-
+// TestTraceAuthorizationIgnoresServiceNamespace distinguishes a logical service
+// grouping from Kubernetes placement on the details and compact search paths.
+// Assisted-by: Codex
+func TestTraceAuthorizationIgnoresServiceNamespace(t *testing.T) {
 	conf := config.NewConfig()
+	conf.KubernetesConfig.ClusterName = "home-cluster"
 	cluster := conf.KubernetesConfig.ClusterName
 
-	// The user can access istio-system only (where the Kiali server runs).
 	sa, user := newAccessibleSetClients([]string{"istio-system", "victim-ns"}, []string{"istio-system"})
 	saClients := map[string]kubernetes.ClientInterface{cluster: sa}
 	userClients := map[string]kubernetes.UserClientInterface{cluster: user}
@@ -948,25 +943,60 @@ func TestTraceAuthorizationServiceNamespace(t *testing.T) {
 	discovery := istio.NewDiscovery(saClients, kialiCache, conf)
 	layer := newLayer(userClients, saClients, nil, nil, kialiCache, conf, nil, discovery, nil)
 
-	// The details-path shape: the OTel resource attributes surfaced as
-	// process tags by the Tempo single-trace converter.
-	selfTrace := &model.TracingSingleTrace{Data: jaegerModels.Trace{Spans: []jaegerModels.Span{{
-		Process: &jaegerModels.Process{Tags: []jaegerModels.KeyValue{
-			{Key: "service.name", Value: "kiali.istio-system"},
-			{Key: "service.namespace", Value: "istio-system"},
-			{Key: "k8s.cluster.name", Value: cluster},
-		}},
-	}}}}
-	require.NoError(layer.Tracing.CheckTraceAccess(context.TODO(), selfTrace))
-
-	// The list-path shape: the attribute as a span tag, as the Tempo search
-	// conversion delivers it.
-	listTrace := &jaegerModels.Trace{Spans: []jaegerModels.Span{{
-		Tags: []jaegerModels.KeyValue{
-			{Key: "service.name", Value: "kiali.istio-system"},
-			{Key: "service.namespace", Value: "istio-system"},
+	for _, tt := range []struct {
+		canonicalNamespace string
+		name               string
+		serviceNamespace   string
+		wantAccess         bool
+	}{
+		{
+			name:             "logical namespace alone cannot grant access",
+			serviceNamespace: "istio-system",
 		},
-	}}}
-	require.True(traceInNamespace(listTrace, cluster, "istio-system"))
-	require.False(traceInNamespace(listTrace, cluster, "victim-ns"))
+		{
+			canonicalNamespace: "victim-ns",
+			name:               "logical namespace cannot authorize denied Kubernetes namespace",
+			serviceNamespace:   "istio-system",
+		},
+		{
+			canonicalNamespace: "istio-system",
+			name:               "canonical namespace authorizes self traces",
+			serviceNamespace:   "victim-ns",
+			wantAccess:         true,
+		},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			for _, shape := range []string{"inline process", "process map", "span"} {
+				t.Run(shape, func(t *testing.T) {
+					require := require.New(t)
+					tags := []jaegerModels.KeyValue{
+						{Key: "k8s.cluster.name", Value: cluster},
+						{Key: "service.namespace", Value: tt.serviceNamespace},
+					}
+					if tt.canonicalNamespace != "" {
+						tags = append(tags, jaegerModels.KeyValue{Key: "k8s.namespace.name", Value: tt.canonicalNamespace})
+					}
+					trace := jaegerModels.Trace{Spans: []jaegerModels.Span{{}}}
+					switch shape {
+					case "inline process":
+						trace.Spans[0].Process = &jaegerModels.Process{Tags: tags}
+					case "process map":
+						trace.Processes = map[jaegerModels.ProcessID]jaegerModels.Process{"p1": {Tags: tags}}
+						trace.Spans[0].ProcessID = "p1"
+					case "span":
+						trace.Spans[0].Tags = tags
+					}
+
+					err := layer.Tracing.CheckTraceAccess(context.TODO(), &model.TracingSingleTrace{Data: trace})
+					if tt.wantAccess {
+						require.NoError(err)
+					} else {
+						require.Error(err)
+						require.True(IsAccessibleError(err))
+					}
+					require.Equal(tt.wantAccess, traceInNamespace(&trace, cluster, "istio-system"))
+				})
+			}
+		})
+	}
 }
