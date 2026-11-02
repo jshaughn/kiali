@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from 'store/ConfigStore';
 import { ChatAIActions } from 'actions/ChatAIActions';
 import { Prompt } from '../Prompt';
+import { ChatBotContent } from '../ChatBotContent';
 import * as API from 'services/Api';
 
 // lodash-es stubs: replace with equivalent inline implementations so the module loads correctly.
@@ -41,11 +42,17 @@ rstest.mock('../EntryChat/ToolModal', () => ({
   ToolModal: () => null
 }));
 
+rstest.mock('../EntryChat/EntryChat', () => ({ EntryChat: () => null }));
+
 // Lightweight MessageBar stub: textarea + send button for prompt/context tests.
 rstest.mock('@patternfly/chatbot', () => {
   const ReactModule = require('react');
   return {
     ChatbotDisplayMode: { default: 'default', docked: 'docked', embedded: 'embedded', fullscreen: 'fullscreen' },
+    ChatbotContent: ({ children }: { children: React.ReactNode }) => children,
+    MessageBox: ({ children }: { children: React.ReactNode }) => children,
+    ChatbotWelcomePrompt: ({ prompts }: { prompts: { onClick: () => void; title: string }[] }) =>
+      ReactModule.createElement('button', { onClick: prompts[0].onClick }, prompts[0].title),
     MessageBar: ({
       innerRef,
       isSendButtonDisabled,
@@ -66,7 +73,7 @@ rstest.mock('@patternfly/chatbot', () => {
           'data-test': 'mock-prompt-input',
           onChange: (e: { target: { value: string } }) => onChange?.(e),
           ref: innerRef,
-          value: value ?? ''
+          defaultValue: value ?? ''
         }),
         ReactModule.createElement(
           'button',
@@ -81,9 +88,10 @@ rstest.mock('@patternfly/chatbot', () => {
   };
 });
 
-const renderPrompt = (): ReturnType<typeof render> =>
+const renderPrompt = (withWelcome = false): ReturnType<typeof render> =>
   render(
     <Provider store={store}>
+      {withWelcome && <ChatBotContent chatHistoryEndRef={{ current: null }} />}
       <Prompt scrollIntoView={rstest.fn()} />
     </Provider>
   );
@@ -170,6 +178,7 @@ describe('Prompt health-history chat context', () => {
     store.dispatch(ChatAIActions.setChatContext(''));
     store.dispatch(ChatAIActions.setQuery(''));
     (API.getChatPrompts as Mock).mockResolvedValue({ data: [] });
+    (API.postChatAI as Mock).mockResolvedValue({ status: 500, statusText: 'Test response', body: null });
   });
 
   it('clears supplemental chat context when the user edits the pre-filled prompt', async () => {
@@ -202,5 +211,55 @@ describe('Prompt health-history chat context', () => {
 
     expect(store.getState().ai.chat.chatContext).toBe('');
     expect(store.getState().ai.chat.query).toBe('');
+  });
+
+  it('sends supplemental context once without adding it to the displayed user message', async () => {
+    store.dispatch(ChatAIActions.setChatContext('Health history investigation: 2026-11-01T05:30:00.000Z'));
+    store.dispatch(ChatAIActions.setQuery('Investigate reviews'));
+    const { getByTestId } = renderPrompt();
+
+    await act(async () => {
+      fireEvent.click(getByTestId('mock-send-button'));
+    });
+
+    expect(API.postChatAI).toHaveBeenCalledTimes(1);
+    expect((API.postChatAI as Mock).mock.calls[0][2].query).toBe(
+      'Context: Health history investigation: 2026-11-01T05:30:00.000Z\n\nInvestigate reviews'
+    );
+    expect(store.getState().ai.chat.chatHistory.first()?.get('text')).toBe('Investigate reviews');
+    expect(store.getState().ai.chat.chatContext).toBe('');
+  });
+
+  it('discards investigation context when the welcome prompt replaces the draft', async () => {
+    store.dispatch(ChatAIActions.setChatContext('Health history investigation: reviews yesterday'));
+    store.dispatch(ChatAIActions.setQuery('Investigate reviews'));
+    const { getByRole, getByTestId } = renderPrompt(true);
+
+    await act(async () => {
+      fireEvent.click(getByRole('button', { name: 'What can you help me with?' }));
+    });
+    await act(async () => {
+      fireEvent.click(getByTestId('mock-send-button'));
+    });
+
+    expect((API.postChatAI as Mock).mock.calls[0][2].query).toBe('What can you help me with in Kiali?');
+  });
+
+  it('syncs an external prefill, caps its height, and resets the field when cleared', async () => {
+    const { getByTestId } = renderPrompt();
+    const input = getByTestId('mock-prompt-input') as HTMLTextAreaElement;
+    Object.defineProperty(input, 'scrollHeight', { configurable: true, value: 240 });
+    // Mark the uncontrolled field as edited before an external prompt replaces it.
+    fireEvent.change(input, { target: { value: 'Old draft' } });
+
+    act(() => store.dispatch(ChatAIActions.setQuery('A long prefilled investigation')));
+
+    expect(input.value).toBe('A long prefilled investigation');
+    await waitFor(() => expect(input.style.overflowY).toBe('auto'));
+    expect(parseFloat(input.style.height)).toBeLessThan(240);
+
+    fireEvent.change(input, { target: { value: '' } });
+    await waitFor(() => expect(input.style.height).toBe(''));
+    expect(input.style.overflowY).toBe('hidden');
   });
 });

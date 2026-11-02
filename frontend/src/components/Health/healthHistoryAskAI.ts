@@ -1,11 +1,7 @@
 import { isMultiCluster } from 'config';
 import type { HealthHistoryType } from 'services/Api';
 import type { HealthStatusId } from 'types/Health';
-import {
-  formatHealthHistoryChatRangeTo,
-  formatHealthHistoryChatTimestamp,
-  type HealthHistoryRange
-} from './HealthHistoryNavigation';
+import { formatHealthHistoryChatTimestamp, type HealthHistoryRange } from './HealthHistoryNavigation';
 import { healthStatusI18nKey } from './HealthStatusRibbonUtils';
 
 type TranslateFn = (key: string, options?: Record<string, unknown>) => string;
@@ -68,8 +64,9 @@ export const buildHealthHistoryChatContext = (
   cluster?: string
 ): string => {
   const resource = formatResourceDescription(healthType, name, namespace, t);
-  const from = formatHealthHistoryChatTimestamp(range.from);
-  const to = formatHealthHistoryChatRangeTo(range.to);
+  // The model cannot infer the browser's locale or timezone from the visible prompt.
+  const from = new Date(range.from).toISOString();
+  const to = new Date(range.to).toISOString();
   const statusLabel = t(healthStatusI18nKey(status));
   const clusterSuffix = cluster && isMultiCluster ? t(" in cluster '{{cluster}}'", { cluster }) : '';
   const intro = `Health history investigation: status ${statusLabel}, window ${from} to ${to}, ${resource}${clusterSuffix}.`;

@@ -1,9 +1,7 @@
 import { buildHealthHistoryChatContext, buildHealthHistoryChatQuery } from '../healthHistoryAskAI';
-import {
-  formatHealthHistoryChatRangeTo,
-  formatHealthHistoryChatTimestamp,
-  getHealthHistoryRange
-} from '../HealthHistoryNavigation';
+import { formatHealthHistoryChatTimestamp, getHealthHistoryRange } from '../HealthHistoryNavigation';
+
+rstest.mock('config', () => ({ isMultiCluster: true }));
 
 const identityT = (key: string, options?: Record<string, unknown>): string => {
   if (!options) {
@@ -78,8 +76,7 @@ describe('buildHealthHistoryChatContext', () => {
 
     expect(context).toContain('Health history investigation');
     expect(context).toContain('reviews');
-    expect(context).toContain(formatHealthHistoryChatTimestamp(range.from));
-    expect(context).toContain(formatHealthHistoryChatRangeTo(range.to));
+    expect(context).toContain('2026-10-15T11:55:00.000Z to 2026-10-15T12:05:00.000Z');
     expect(context).toContain('get_metrics (resourceType service');
     expect(context).toContain('list_traces (serviceName');
   });
@@ -89,5 +86,42 @@ describe('buildHealthHistoryChatContext', () => {
 
     expect(context).toContain('get_logs (name must be this workload name');
     expect(context).not.toContain('What likely caused this');
+  });
+
+  it.each([
+    ['2026-11-01T01:25:00-04:00', '2026-11-01T01:35:00-04:00', '2026-11-01T05:25:00.000Z', '2026-11-01T05:35:00.000Z'],
+    ['2026-11-01T01:25:00-05:00', '2026-11-01T01:35:00-05:00', '2026-11-01T06:25:00.000Z', '2026-11-01T06:35:00.000Z'],
+    ['2026-12-31T23:55:00Z', '2027-01-01T00:05:00Z', '2026-12-31T23:55:00.000Z', '2027-01-01T00:05:00.000Z']
+  ])('preserves absolute bounds for %s through %s', (from, to, expectedFrom, expectedTo) => {
+    const context = buildHealthHistoryChatContext(identityT, 'service', 'reviews', 'bookinfo', 'Degraded', {
+      from: Date.parse(from),
+      to: Date.parse(to)
+    });
+
+    expect(context).toContain(`window ${expectedFrom} to ${expectedTo}`);
+  });
+
+  it('keeps the selected cluster in both the visible query and hidden context', () => {
+    const query = buildHealthHistoryChatQuery(
+      identityT,
+      'service',
+      'reviews',
+      'Degraded',
+      timestamp * 1000,
+      '10 minutes',
+      'east'
+    );
+    const context = buildHealthHistoryChatContext(
+      identityT,
+      'service',
+      'reviews',
+      'bookinfo',
+      'Degraded',
+      range,
+      'east'
+    );
+
+    expect(query).toContain("in cluster 'east'");
+    expect(context).toContain("service 'reviews' in namespace 'bookinfo' in cluster 'east'");
   });
 });

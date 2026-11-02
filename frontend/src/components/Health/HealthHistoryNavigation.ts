@@ -24,14 +24,9 @@ export const formatHealthHistoryInvestigationBound = (boundMs: number, selectedT
   return sameDay ? date.toLocaleTimeString(undefined, timeOptions) : date.toLocaleString(undefined, dateTimeOptions);
 };
 
-/** Full date and time for AI prompts so past days are not mistaken for today. */
+/** Include the UTC offset so repeated local times during daylight-saving changes remain distinct. */
 export const formatHealthHistoryChatTimestamp = (boundMs: number): string => {
-  return new Date(boundMs).toLocaleString(undefined, dateTimeOptions);
-};
-
-/** End of a chat prompt range: time only; the start timestamp carries the date. */
-export const formatHealthHistoryChatRangeTo = (boundMs: number): string => {
-  return new Date(boundMs).toLocaleTimeString(undefined, timeOptions);
+  return new Date(boundMs).toLocaleString(undefined, { ...dateTimeOptions, timeZoneName: 'shortOffset' });
 };
 
 export const getHealthHistoryRange = (timestamp: number, duration: number, now = Date.now()): HealthHistoryRange => {

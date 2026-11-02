@@ -33,10 +33,43 @@ import { derivePromptCategory } from './promptCategory';
 import { useChatResourceHealth } from './hooks/useChatResourceHealth';
 import { buildPageContext, formatChatRequestQuery } from './pageContext';
 import { buildPromptContext, buildPromptVariables, enrichPromptContext, substitutePrompts } from './promptContext';
+import { PFSpacer } from 'styles/PfSpacer';
+import { kialiStyle } from 'styles/StyleUtils';
 
 type PromptProps = {
   scrollIntoView: () => void;
 };
+
+const messageBarStyle = kialiStyle({
+  $nest: {
+    '& .pf-chatbot__message-bar': {
+      padding: PFSpacer.sm
+    },
+    '& .pf-chatbot__message-bar-input': {
+      flex: '1 1 100%',
+      minWidth: 0,
+      padding: 0
+    },
+    '& .pf-chatbot__message-textarea': {
+      height: 'auto !important',
+      margin: '0 !important',
+      maxHeight: 'none !important',
+      overflowY: 'visible'
+    },
+    '& .pf-chatbot__message-textarea textarea': {
+      boxSizing: 'border-box',
+      lineHeight: 1.375,
+      minHeight: '1.5rem',
+      overflowX: 'hidden',
+      padding: `${PFSpacer.sm} 0.75rem !important`,
+      resize: 'none',
+      width: '100%'
+    },
+    '& .pf-chatbot__message-bar-actions.pf-m-grouped': {
+      paddingBlockStart: PFSpacer.xs
+    }
+  }
+});
 
 export const Prompt = React.memo(({ scrollIntoView }: PromptProps) => {
   const { t } = useKialiTranslation();
@@ -497,35 +530,7 @@ export const Prompt = React.memo(({ scrollIntoView }: PromptProps) => {
           ))}
         </div>
       )}
-      <div className="chatbot-message-bar-wrapper">
-        <style>{`
-          .chatbot-message-bar-wrapper .pf-chatbot__message-bar {
-            padding: var(--pf-t--global--spacer--sm);
-          }
-          .chatbot-message-bar-wrapper .pf-chatbot__message-bar-input {
-            flex: 1 1 100%;
-            min-width: 0;
-            padding: 0;
-          }
-          .chatbot-message-bar-wrapper .pf-chatbot__message-textarea {
-            height: auto !important;
-            margin: 0 !important;
-            max-height: none !important;
-            overflow-y: visible !important;
-          }
-          .chatbot-message-bar-wrapper .pf-chatbot__message-textarea textarea {
-            box-sizing: border-box;
-            line-height: 1.375;
-            min-height: 1.5rem;
-            overflow-x: hidden;
-            padding: 0.5rem 0.75rem !important;
-            resize: none;
-            width: 100%;
-          }
-          .chatbot-message-bar-wrapper .pf-chatbot__message-bar-actions.pf-m-grouped {
-            padding-block-start: var(--pf-t--global--spacer--xs);
-          }
-        `}</style>
+      <div className={messageBarStyle}>
         <MessageBar
           additionalActions={interactionModeDropdown}
           alwayShowSendButton

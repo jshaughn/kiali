@@ -1,9 +1,9 @@
 import React from 'react';
-import { Map as ImmutableMap, List as ImmutableList } from 'immutable';
+import type { Map as ImmutableMap, List as ImmutableList } from 'immutable';
 import { ChatbotContent, ChatbotWelcomePrompt, MessageBox } from '@patternfly/chatbot';
 import type { WelcomePrompt } from '@patternfly/chatbot/dist/esm/ChatbotWelcomePrompt/ChatbotWelcomePrompt';
 import { useDispatch, useSelector } from 'react-redux';
-import { KialiAppState } from 'store/Store';
+import type { KialiAppState } from 'store/Store';
 import { EntryChat } from './EntryChat/EntryChat';
 import { t } from 'utils/I18nUtils';
 import { ChatAIActions } from 'actions/ChatAIActions';
@@ -23,7 +23,10 @@ export const ChatBotContent: React.FC<ChatBotContentProps> = ({ chatHistoryEndRe
       {
         title: t('What can you help me with?'),
         message: t('Learn what the chatbot can do in Kiali.'),
-        onClick: () => dispatch(ChatAIActions.setQuery(t('What can you help me with in Kiali?')))
+        onClick: () => {
+          dispatch(ChatAIActions.setChatContext(''));
+          dispatch(ChatAIActions.setQuery(t('What can you help me with in Kiali?')));
+        }
       }
     ],
     [dispatch]

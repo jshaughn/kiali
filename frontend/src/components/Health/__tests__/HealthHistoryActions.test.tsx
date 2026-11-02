@@ -8,6 +8,7 @@ import { ChatAIActions } from 'actions/ChatAIActions';
 import { ActionKeys } from 'actions/ActionKeys';
 
 const mockDispatch = rstest.fn();
+let mockChatEnabled = true;
 const mockSelectorState = {
   ai: { chat: { allowed: true } },
   globalState: { kiosk: '' },
@@ -20,7 +21,7 @@ rstest.mock('hooks/redux', () => ({
 }));
 
 rstest.mock('components/ChatBot/hooks/useChatAIEnabled', () => ({
-  useChatAIEnabled: () => true
+  useChatAIEnabled: () => mockChatEnabled
 }));
 
 rstest.mock('components/Link/KialiLink', () => ({
@@ -54,6 +55,7 @@ describe('health history click actions', () => {
 
   beforeEach(() => {
     mockDispatch.mockClear();
+    mockChatEnabled = true;
     mockSelectorState.ai.chat.allowed = true;
     mockSelectorState.globalState.kiosk = '';
   });
@@ -262,6 +264,19 @@ describe('health history click actions', () => {
     mockSelectorState.ai.chat.allowed = false;
     const { ribbon } = setup();
     fireEvent.click(ribbon, { clientX: 300 });
+    await screen.findByTestId('health-history-actions');
+    expect(screen.queryByTestId('health-history-troubleshoot-ai')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['AI disabled', false, ''],
+    ['kiosk mode', true, 'true']
+  ])('hides AI Chat with %s', async (_description, enabled, kiosk) => {
+    mockChatEnabled = enabled;
+    mockSelectorState.globalState.kiosk = kiosk;
+    const { ribbon } = setup();
+    fireEvent.click(ribbon, { clientX: 300 });
+
     await screen.findByTestId('health-history-actions');
     expect(screen.queryByTestId('health-history-troubleshoot-ai')).not.toBeInTheDocument();
   });

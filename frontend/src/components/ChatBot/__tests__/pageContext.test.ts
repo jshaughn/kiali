@@ -6,7 +6,19 @@ rstest.mock('config', () => ({
   }
 }));
 
-import { buildPageContext } from '../pageContext';
+import { buildPageContext, formatChatRequestQuery } from '../pageContext';
+
+describe('formatChatRequestQuery', () => {
+  it('keeps the page, investigation, and editable query in separate sections', () => {
+    expect(
+      formatChatRequestQuery('Investigate reviews', 'Service reviews in bookinfo', 'Window 2026-11-01T05:30:00Z')
+    ).toBe('Context: Service reviews in bookinfo\nWindow 2026-11-01T05:30:00Z\n\nInvestigate reviews');
+  });
+
+  it('leaves a query unchanged when both contexts are empty', () => {
+    expect(formatChatRequestQuery('What can you help me with?', '', ' ')).toBe('What can you help me with?');
+  });
+});
 
 describe('buildPageContext', () => {
   beforeEach(() => {
