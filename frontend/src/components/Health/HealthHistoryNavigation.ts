@@ -24,9 +24,9 @@ export const formatHealthHistoryInvestigationBound = (boundMs: number, selectedT
   return sameDay ? date.toLocaleTimeString(undefined, timeOptions) : date.toLocaleString(undefined, dateTimeOptions);
 };
 
-/** Include the UTC offset so repeated local times during daylight-saving changes remain distinct. */
+/** Keep the visible prompt localized; hidden context supplies the absolute UTC bounds. */
 export const formatHealthHistoryChatTimestamp = (boundMs: number): string => {
-  return new Date(boundMs).toLocaleString(undefined, { ...dateTimeOptions, timeZoneName: 'shortOffset' });
+  return new Date(boundMs).toLocaleString(undefined, dateTimeOptions);
 };
 
 export const getHealthHistoryRange = (timestamp: number, duration: number, now = Date.now()): HealthHistoryRange => {
